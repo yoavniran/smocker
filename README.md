@@ -18,6 +18,8 @@ you can pass in a configuration object with the following parameters:
 
 > **addCorsHeader** - whether to add the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) headers to the response (default: **true**)
 
+> **corsEchoRequestHeaders** - whether to echo the headers sent by a [preflight](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests) request as the allowed cross origin request headers (default: **true**)
+
 ## Resources & Url Matching
 
 When the server starts it looks at the folder configured as the resources and uses the folder names as the paths for matching incoming requests.
