@@ -1,0 +1,27 @@
+{
+  "name": "smocker",
+  "description": "very simple http server mocker loading mocked data from node modules",
+  "version": "0.0.1",
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yoavniran/smocker"
+  },
+  "keywords": [
+    "mocks",
+    "data",
+    "http server"
+  ],
+  "author": "Yoav Niran",
+  "license": {
+    "type": "WTFPL",
+    "url": "https://raw.githubusercontent.com/yoavniran/mocha-stirrer/master/LICENSE"
+  },
+  "bugs": {
+    "url": "https://github.com/yoavniran/smocker/issues"
+  },
+  "dependencies": {
+    "debug": "^2.2.0",
+    "lodash": "^3.10.1"
+  }
+}
