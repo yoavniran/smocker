@@ -59,8 +59,64 @@ call start() to start up the mock server:
 var smocker = require("smocker")
 
 smocker.start({
-	
+	resources: "../resources",
+	port: 8090,
+	requestPrefix: "api"	
 });
 
 ```
 
+Then in the folder called "resources" you can place the following structure:
+
+* resources
+	* orders.$
+		* get.js
+
+In get.js you can have this code:
+
+``` javascript
+
+module.exports = {
+	response: {
+		id: 123,
+		customer: 56333,
+		quantity: 2
+	}
+};
+
+``` 
+
+or use the function form:
+
+``` javascript
+
+module.exports = function(req, options){
+	
+	if (options.pathPars.length >0){ //request url includes order id
+
+		return {
+			response: {
+				id: 123,
+				customer: 56333,
+				quantity: 2
+			}
+		};
+	}
+	else{
+		return {
+			 response: [
+				{
+					id: 123,
+					customer: 56333,
+					quantity: 2
+				},
+				{
+					id: 456,
+					customer: 52343,
+					quantity: 1
+				}
+		]};
+	}
+};
+
+```
