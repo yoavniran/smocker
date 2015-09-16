@@ -37,11 +37,16 @@ Inside the resource folders a .js file should be placed named after the [method]
 So to match a GET request on "/api/orders/123" you should have the following file at: **"resources/api.orders.$/get.js"**
 
 In this case "get.js" should be a normal node module returning either a json object or a function that returns a json object.
-The object should have a **response** property which will be used for the response that will be sent to the client making the request.
 
-The object can also have a statusCode property to use as the status of the response. Otherwise the response code will be 200.
+The returned object can have the following properties:
 
-In case a function is used, it should return the same object structure. The function will receive a reference to the incoming request and an options objects which will contain:
+* **response**: the response body that will be returned to the client
+* **statusCode**: the code number that will be returned to the client (default: **200**)
+* **statusMessage**: the message that will be returned to the client (default: **ok**)
+* **headers**: a key/val map of headers to return to the client (default: **{content-type: "application/json"}**)
+
+In case a function is used, it should return the same object structure. 
+The function will receive a reference to the incoming request and an options objects which contains:
 
 * **params**: the request URL parameters of the incoming request as a key/val pair. 
 * **config**: the configuration passed to the start method. 
