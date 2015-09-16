@@ -1,7 +1,7 @@
 {
   "name": "smocker",
   "description": "very simple http server mocker loading mocked data from node modules",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./index.js",
   "repository": {
     "type": "git",
