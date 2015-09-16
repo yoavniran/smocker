@@ -1,5 +1,12 @@
 # Smocker
 
+A very simple http server mocker loading mocked data from node modules.
+
+ * write resources in an easy to manage folder structure
+ * resources are simple node modules so they can be simple JSON or contain logic using functions
+ * supports CORS for easy use during development 
+ * supports jsonp
+
 ## Install
 
 > _npm install smocker --save-dev_
