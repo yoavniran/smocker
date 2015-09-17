@@ -1,20 +1,31 @@
 # Smocker
 
-A very simple http server mocker loading mocked data from node modules.
+* [Intro](#intro)
+* [Install](#install)
+* [Configuration](#config)
+* [Resources & Url Matching](#resnmatch)
+* [Mock Resources](#mocks)
+* [Example](#example)
+
+<a id="intro"/> 
+## Intro
+A very simple HTTP server mocker loading mocked data from node modules.
 
  * write resources in an easy to manage folder structure
  * resources are simple node modules so they can be simple JSON or contain logic using functions
  * supports CORS for easy use during development 
  * supports jsonp
 
+<a id="install"/> 
 ## Install
 
 > _npm install smocker --save-dev_
 
-
-## Reference
+<a id="config"/> 
+## Configuration
 
 you can pass in a configuration object with the following parameters:
+
 > **port** - the server port to use (default: **9991**)
 
 > **resources** - the path to where the resources for the responses will be loaded from (default: **"./resources"**)
@@ -25,8 +36,21 @@ you can pass in a configuration object with the following parameters:
 
 > **addCorsHeader** - whether to add the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) headers to the response (default: **true**)
 
+> **corsAllowedOrigin**  - the hosts to allow when CORS is enabled (default: **"*"**)
+
 > **corsEchoRequestHeaders** - whether to echo the headers sent by a [preflight](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests) request as the allowed cross origin request headers (default: **true**)
 
+> **headers** - a key/val map of default headers to send with every response (default: **{content-type: "application/json"}**)
+
+> **cbParName** - the url parameter name to use as the callback function name for jsonp (default **"cb"**)
+
+> **okStatusCode** - the default status code to set on the response (default: **200**)
+
+> **okStatusMessage** - the default status message to set on the response (default: **"ok"**)
+
+> **readRequestBody** - whether to read the body of incoming requests and pass it to the resource module (when using function form) (default **true**)
+
+<a id="resnmatch"/> 
 ## Resources & Url Matching
 
 When the server starts it looks at the folder configured as the resources and uses the folder names as the paths for matching incoming requests.
@@ -38,7 +62,8 @@ The '$' symbol marks a placeholder that will match any path part regardless of t
 
 Incoming requests are matched using the [request url](https://nodejs.org/docs/latest-v0.12.x/api/http.html#http_message_url). 
 
-### Mock Resources
+<a id="mocks"/> 
+## Mock Resources
 
 Inside the resource folders a .js file should be placed named after the [method](https://nodejs.org/docs/latest-v0.12.x/api/http.html#http_message_method) the request used. 
 So to match a GET request on "/api/orders/123" you should have the following file at: **"resources/api.orders.$/get.js"**
@@ -58,12 +83,13 @@ The function will receive a reference to the incoming request and an options obj
 * **params**: the request URL parameters of the incoming request as a key/val pair. 
 * **config**: the configuration passed to the start method. 
 * **pathPars**: an array containing values of any dynamic path part used within the request. For example if the resource is "api.orders.$" and the request URL is "/api/orders/123" then "123" will be the first item in the pathPars array.
+* **requestBody**: the body of the request if the request contained one and the __readRequestBody__ configuration parameter is set to true (default)
 
-#### prefixing
+### prefixing
 In case all of the requests being mocked start the same path part for example: 
 "/api/orders..." and "/api/users..." then the "/api" part can be anchored using the _requestPrefix_ configuration parameter. This will allow to name the resource folder "orders.$" instead of "api.oreders.$". Therefore the requestPrefix should have the value: "api"
 
-
+<a id="example"/> 
 ## Example
 call start() to start up the mock server:
 
