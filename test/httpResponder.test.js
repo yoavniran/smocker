@@ -30,7 +30,8 @@ describe("http responder tests", function () {
             parentFileName: "path/of/parent/module.js",
             parentDir: "path/of/parent",
             absFilePath: "absolute-path-to-file.jpg",
-            fileSize: 101
+            fileSize: 101,
+            imageType: "image/png"
         },
         spies: {
             "setHeader": stirrer.EMPTY,
@@ -149,6 +150,9 @@ describe("http responder tests", function () {
         responder.respond(this.pars.req, this.pars.res, {
             responseData: {
                 filePath: this.pars.filePath,
+                headers: {
+                    "content-type": this.pars.imageType
+                },
                 isFile: true
             },
             config: {
@@ -172,6 +176,7 @@ describe("http responder tests", function () {
             expect(this.getStub("path").dirname).to.have.been.calledWith(this.pars.parentFileName);
             expect(this.getStub("path").join).to.have.been.calledWith(this.pars.parentDir, this.pars.filePath);
             expect(this.spies.setHeader).to.have.been.calledWith("content-length", this.pars.fileSize);
+            expect(this.spies.setHeader).to.have.been.calledWith("content-type", this.pars.imageType);
             expect(this.spies.pipe).to.have.been.calledWith(this.pars.res);
             next();
         }

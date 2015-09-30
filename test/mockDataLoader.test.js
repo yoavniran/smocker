@@ -37,7 +37,7 @@ describe("mock data loader tests", function () {
                 response: {result: "hello world"}
             }
         },
-        spies: {
+        stubs: {
             fnForm: stirrer.EMPTY
         },
         requires: [{
@@ -68,11 +68,12 @@ describe("mock data loader tests", function () {
     cup.pour("should handle function form of mock module", function () {
 
         var dataLoader = this.getRequired("dataLoader");
-        dataLoader.load(this.pars.req, this.pars.noCacheOptions);
+        var result = dataLoader.load(this.pars.req, this.pars.noCacheOptions);
 
-        expect(this.spies.fnForm).to.have.been.calledOnce();
+        expect(this.stubs.fnForm).to.have.been.calledOnce();
+        expect(result).to.equal(this.pars.jsonResult);
 
-        var fnCall = this.spies.fnForm.getCall(0);
+        var fnCall = this.stubs.fnForm.getCall(0);
 
         expect(fnCall.args).to.have.length(3);
         expect(fnCall.args[0]).to.equal(this.pars.req);
@@ -82,7 +83,8 @@ describe("mock data loader tests", function () {
         expect(fnCall.args[1].requestBody).to.equal("bla bla bla");
     }, {
         befores: function (next) {
-            this.getStub("lib/utils").dynamicLoad.returns(this.spies.fnForm);
+            this.getStub("lib/utils").dynamicLoad.returns(this.stubs.fnForm);
+            this.stubs.fnForm.returns(this.pars.jsonResult);
             next();
         }
     });
