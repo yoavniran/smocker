@@ -7,6 +7,8 @@
 * [Resources & Url Matching](#resnmatch)
 * [Mock Resources](#mocks)
 * [Example](#example)
+* [Binary Responses](#binResponse)
+* [Change Log](#changelog)
 
 <a id="intro"/> 
 ## Intro
@@ -187,6 +189,49 @@ module.exports = function(req, info, utils){
 
 ```
 
-<a id="fileResponse"/>
-## File Responses
+<a id="binResponse"/>
+## Binary Responses
+
+At times you may wish to respond with a binary file rather than a text(typically JSON) response.
+This is possible and made easy by using the utils method: **respondWithFile** that is passed as part of the utils object (third argument) to the mock module when in function form.
+
+The **respondWithFile** method has the following signature: 
+
+``` javascript
+	respondWithFile(filePath, contentType, statusCode, statusMessage)
+```
+
+> **filePath** is either a relative or absolute path to the file to be streamed to the response. If its relative then smocker will attempt to locate it relative to the module that required smocker (same as with the resources)
+
+> **contentType** should preferably match the content type of the file returned to the client
+
+> **statusCode** and **statusMessage** are optional and will default to the configuration
+
+Below is an example of a mock module returning a file:
+
+``` javascript
+
+module.exports = function (req, options, utils) {
+
+    var imgNumber = ((Math.floor(Math.random() * 4) + 1) % 4); //only have 4 images
+
+    return utils.respondWithFile("./files/dynamic_" + imgNumber + ".png", "image/png");
+};
+
+```
+
+If the mock module's path is at: _<project_root>/test/resources/dynamic.image/get.js_ and assuming that the module that required smocker is at: _<project_root>/test/app.js_ then the image file(s) should be stored at: _<project_root>/test/files/_
+
+
+<a id="changelog">
+## Change Log
+
+### 0.2.1
+* support for binary file responses
+* test coverage up from 0 to ~75%
+* improved code structure 
+* minor bug fixes
+
+### 0.1.0
+* First Release
 
