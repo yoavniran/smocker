@@ -2,7 +2,7 @@
   "name": "smocker",
   "description": "very simple http server mocker loading mocked data from node modules",
   "version": "0.1.0",
-  "main": "./index.js",
+  "main": "./lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/yoavniran/smocker"
@@ -13,20 +13,39 @@
     "http server"
   ],
   "author": "Yoav Niran",
-  "license": {
-    "type": "WTFPL",
-    "url": "https://raw.githubusercontent.com/yoavniran/mocha-stirrer/master/LICENSE"
-  },
+  "license": "WTFPL",
+  "licenses": [
+    {
+      "type": "WTFPL",
+      "url": "https://raw.githubusercontent.com/yoavniran/smocker/master/LICENSE"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/yoavniran/smocker/issues"
   },
   "dependencies": {
     "debug": "^2.2.0",
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "lru-cache": "^2.7.0"
   },
   "devDependencies": {
+    "blanket": "^1.1.7",
+    "chai": "^3.3.0",
+    "coveralls": "^2.11.4",
+    "dirty-chai": "^1.2.2",
     "grunt": "^0.4.5",
+    "grunt-blanket": "0.0.8",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-copy": "^0.8.1",
     "grunt-contrib-jshint": "^0.11.3",
-    "time-grunt": "^1.2.1"
+    "grunt-coveralls": "^1.0.0",
+    "grunt-mocha-test": "^0.12.7",
+    "mocha": "^2.3.3",
+    "mocha-lcov-reporter": "^1.0.0",
+    "mocha-stirrer": "^0.2.1",
+    "sinon": "^1.17.1",
+    "sinon-chai": "^2.8.0",
+    "time-grunt": "^1.2.1",
+    "travis-cov": "^0.2.5"
   }
 }

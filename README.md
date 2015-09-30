@@ -2,6 +2,7 @@
 
 * [Intro](#intro)
 * [Install](#install)
+* [API](#api)
 * [Configuration](#config)
 * [Resources & Url Matching](#resnmatch)
 * [Mock Resources](#mocks)
@@ -9,6 +10,7 @@
 
 <a id="intro"/> 
 ## Intro
+
 A very simple HTTP server mocker loading mocked data from node modules.
 
  * write resources in an easy to manage folder structure
@@ -20,6 +22,19 @@ A very simple HTTP server mocker loading mocked data from node modules.
 ## Install
 
 > _npm install smocker --save-dev_
+
+<a id="api"/>
+## API
+
+> start (config)
+
+Start a new instance of Smocker with the provided or default configuration. internally starts a new http server.
+Pass in a configuration object to override the one or more of the defaults (See the configuration section below for details).
+
+> setDefaults (config)
+
+Changes the root defaults object across all instances.
+Use this method to update some or all of the defaults smocker uses when starting a new instance.
 
 <a id="config"/> 
 ## Configuration
@@ -48,7 +63,9 @@ you can pass in a configuration object with the following parameters:
 
 > **okStatusMessage** - the default status message to set on the response (default: **"ok"**)
 
-> **readRequestBody** - whether to read the body of incoming requests and pass it to the resource module (when using function form) (default **true**)
+> **readRequestBody** - whether to read the body of incoming requests and pass it to the resource module (when using function form) (default: **true**)
+
+> **cacheResponses** - whether to cache the mocked modules after they are first loaded to improve performance. Value can be Boolean or a valid positive integer. If set to true will cache all modules. if set to a number will remove old items from cache as it fills up (default: **50**)
 
 <a id="resnmatch"/> 
 ## Resources & Url Matching
@@ -77,13 +94,22 @@ The returned object can have the following properties:
 * **statusMessage**: the message that will be returned to the client (default: **ok**)
 * **headers**: a key/val map of headers to return to the client (default: **{content-type: "application/json"}**)
 
+Another option is to use the function form for the mocked resource. The function is expected to have the following signature: fn(req, info, utils) 
+
 In case a function is used, it should return the same object structure. 
-The function will receive a reference to the incoming request and an options objects which contains:
+
+The function will receive a reference to the incoming request (currently being handled) as the first argument. 
+
+It will also receive an info object as the seconds argument which contains:
 
 * **params**: the request URL parameters of the incoming request as a key/val pair. 
 * **config**: the configuration passed to the start method. 
 * **pathPars**: an array containing values of any dynamic path part used within the request. For example if the resource is "api.orders.$" and the request URL is "/api/orders/123" then "123" will be the first item in the pathPars array.
 * **requestBody**: the body of the request if the request contained one and the __readRequestBody__ configuration parameter is set to true (default)
+
+Finally, it receives a reference to a utils objects as the third argument. Currently the utils object has these methods:
+
+> **respondWithFile** Use method when the response should be a file loaded from disk instead. See example [below](#fileResponse).
 
 ### prefixing
 In case all of the requests being mocked start the same path part for example: 
@@ -130,9 +156,9 @@ or use the function form:
 
 ``` javascript
 
-module.exports = function(req, options){
+module.exports = function(req, info, utils){
 	
-	if (options.pathPars.length >0){ //request url includes order id
+	if (info.pathPars.length >0){ //request url includes order id
 
 		return {
 			response: {
@@ -160,3 +186,7 @@ module.exports = function(req, options){
 };
 
 ```
+
+<a id="fileResponse"/>
+## File Responses
+

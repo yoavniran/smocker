@@ -1,15 +1,13 @@
-/// <binding ProjectOpened='test' />
 module.exports = function (grunt) {
 
     require("time-grunt")(grunt);
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
-    //grunt.loadNpmTasks("grunt-contrib-clean");
-    //grunt.loadNpmTasks("grunt-contrib-copy");
-    //grunt.loadNpmTasks("grunt-mocha-test");
-    //grunt.loadNpmTasks("grunt-blanket");
-    //grunt.loadNpmTasks("grunt-coveralls");
-    //grunt.loadNpmTasks("grunt-release");
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.loadNpmTasks("grunt-mocha-test");
+    grunt.loadNpmTasks("grunt-blanket");
+    grunt.loadNpmTasks("grunt-coveralls");
 
     //grunt.task.renameTask("release", "releaseTask");
 
@@ -23,48 +21,50 @@ module.exports = function (grunt) {
             }
         },
 
-        //clean: ["./output/**/*"],
-        //
-        //copy: {
-        //    test: {
-        //        files: [
-        //            {expand: true, src: "./test/**/*.js", dest: "./output/coverage/"}
-        //        ]
-        //    }
-        //},
-        //
-        //blanket: {        //output the instrumented files
-        //    output: {
-        //        src: "./lib/",
-        //        dest: "./output/coverage/lib"
-        //    }
-        //},
-        //
-        //mochaTest: {
-        //    test: {
-        //        options: {
-        //            reporter: "spec",
-        //            captureFile: "output/results.txt" // Optionally capture the reporter output to a file
-        //        },
-        //        src: ["./test/stirrer.tests.js"]
-        //    },
-        //    coverage: {
-        //        options: {
-        //            reporter: "mocha-lcov-reporter",
-        //            quiet: true,
-        //            captureFile: "./output/coverage.lcov.txt"
-        //        },
-        //        src: ["./output/coverage/test/stirrer.tests.js"]
-        //    },
-        //    htmlcov: {
-        //        options: {
-        //            reporter: "html-cov",
-        //            quiet: true,
-        //            captureFile: "./output/coverage.html"
-        //        },
-        //        src: ["./output/coverage/test/stirrer.tests.js"]
-        //    },
-        //    "travis-cov": {
+
+        clean: ["./output/**/*"],
+
+        copy: {
+            test: {
+                files: [
+                    {expand: true, src: "./test/**/*.js", dest: "./output/coverage/"}
+                ]
+            }
+        },
+
+        blanket: {        //output the instrumented files
+            output: {
+                src: "./lib/",
+                dest: "./output/coverage/lib"
+            }
+        },
+
+        mochaTest: {
+            test: {
+                options: {
+                    reporter: "spec",
+                    captureFile: "output/results.txt" // Optionally capture the reporter output to a file
+                },
+                src: ["./test/smocker.tests.js"]
+            },
+            coverage: {
+                options: {
+                    reporter: "mocha-lcov-reporter",
+                    quiet: true,
+                    captureFile: "./output/coverage.lcov.txt"
+                },
+                src: ["./output/coverage/test/smocker.tests.js"]
+            },
+            htmlcov: {
+                options: {
+                    reporter: "html-cov",
+                    quiet: true,
+                    captureFile: "./output/coverage.html"
+                },
+                src: ["./output/coverage/test/smocker.tests.js"]
+            }
+        }
+        //"travis-cov": {
         //        options: {
         //            reporter: "travis-cov"
         //        },
@@ -87,8 +87,8 @@ module.exports = function (grunt) {
         //releaseTask: {
         //    options: {
         //        github: {
-			//		repo: "yoavniran/mocha-stirrer",
-			//		accessTokenVar: "GRUNT_GH_TOKEN"
+        //		repo: "yoavniran/mocha-stirrer",
+        //		accessTokenVar: "GRUNT_GH_TOKEN"
         //            //usernameVar: "GRUNT_GH_USERNAME",
         //            //passwordVar: "GRUNT_GH_PASSWORD"
         //        }
@@ -97,8 +97,8 @@ module.exports = function (grunt) {
 
     });
 
-    //grunt.registerTask("test", ["mochaTest:test"]);
-    //grunt.registerTask("localcov", ["clean", "blanket", "copy:test", "mochaTest:htmlcov"]);
+    grunt.registerTask("test", ["mochaTest:test"]);
+    grunt.registerTask("localcov", ["clean", "blanket", "copy:test", "mochaTest:htmlcov"]);
     //grunt.registerTask("coverage", ["clean", "blanket", "copy:test", "mochaTest:coverage", "mochaTest:htmlcov", "coveralls"]);
     //grunt.registerTask("build", ["jshint", "test", "coverage", "mochaTest:travis-cov"]);
 
