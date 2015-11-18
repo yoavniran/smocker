@@ -1,44 +1,17 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+import http from "http";
+import url from "url";
+import qs from "querystring";
+import path from "path";
+import _  from "lodash";
+import Debug  from "debug";
+import {load as loadResources} from "./resourcesLoader";
+import {load as loadMockedData} from "./mockDataLoader";
+import {respond as httpRespond} from "./httpResponder";
+import {match as matchRequest} from "./requestMatcher";
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var _http = require("http");
-
-var _http2 = _interopRequireDefault(_http);
-
-var _url = require("url");
-
-var _url2 = _interopRequireDefault(_url);
-
-var _querystring = require("querystring");
-
-var _querystring2 = _interopRequireDefault(_querystring);
-
-var _path = require("path");
-
-var _path2 = _interopRequireDefault(_path);
-
-var _lodash = require("lodash");
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _debug = require("debug");
-
-var _debug2 = _interopRequireDefault(_debug);
-
-var _resourcesLoader = require("./resourcesLoader");
-
-var _mockDataLoader = require("./mockDataLoader");
-
-var _httpResponder = require("./httpResponder");
-
-var _requestMatcher = require("./requestMatcher");
-
-var debug = (0, _debug2["default"])("smocker"),
+const debug = Debug("smocker"),
     JSON_TYPE = "application/json",
     _isJson = /\/json/;
 
@@ -85,20 +58,23 @@ var _defaults = {
  */
 function start(config) {
 
-    config = _lodash2["default"].extend({}, _defaults, _usedDefaults, config);
+    config = _.extend({}, _defaults, _usedDefaults, config);
 
-    if (!_path2["default"].isAbsolute(config.resources)) {
+    if (!path.isAbsolute(config.resources)) {
         config.parent = module.parent.parent || module.parent; //if used relative path, try and use the module that required index.js or smocker.js directly as the parent
     }
 
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject)=> {
 
-        (0, _resourcesLoader.load)(config).then(_onResourcesLoaded.bind(null, config)).then(function (server) {
-            resolve(_stop.bind(null, server));
-        })["catch"](function (err) {
-            console.error("Smocker - failed to load resources! ", err);
-            reject(err);
-        });
+        loadResources(config)
+            .then(_onResourcesLoaded.bind(null, config))
+            .then((server)=> {
+                resolve(_stop.bind(null, server));
+            })
+            .catch((err)=> {
+                console.error("Smocker - failed to load resources! ", err);
+                reject(err);
+            });
     });
 }
 
@@ -109,8 +85,8 @@ function start(config) {
  * @returns Object - a clone object of the current defaults
  */
 function setDefaults(config) {
-    _usedDefaults = _lodash2["default"].extend({}, _defaults, config);
-    return _lodash2["default"].clone(_usedDefaults);
+    _usedDefaults = _.extend({}, _defaults, config);
+    return _.clone(_usedDefaults );
 }
 
 /**
@@ -118,9 +94,9 @@ function setDefaults(config) {
  *
  * @returns Object - a clone object of the restored defaults
  */
-function restoreDefaults() {
+function restoreDefaults(){
     _usedDefaults = null;
-    return _lodash2["default"].clone(_defaults);
+    return _.clone(_defaults);
 }
 
 /**************************************************************
@@ -131,7 +107,7 @@ function _stop(server) {
 
     if (server) {
         debug("closing http server!");
-        server.close(function (err) {
+        server.close((err)=> {
             debug("server close encountered an error: ", err);
         });
     }
@@ -141,9 +117,9 @@ function _onResourcesLoaded(config, resources) {
 
     debug("resources loaded, about to start http server");
 
-    var server = _http2["default"].createServer(_processRequest.bind(null, resources, config));
+    const server = http.createServer(_processRequest.bind(null, resources, config));
 
-    server.listen(config.port, function () {
+    server.listen(config.port, () => {
         debug("HTTP server listening on: " + config.port);
     });
 
@@ -154,17 +130,17 @@ function _processRequest(resources, config, req, res) {
 
     debug("incoming request - " + req.method + "::" + req.url);
 
-    var params = _getQueryParams(req),
-        resourcePathData = (0, _requestMatcher.match)(req, resources),
+    const params = _getQueryParams(req),
+        resourcePathData = matchRequest(req, resources),
         jsonpName = params[config.cbParName];
 
-    var options = { //data for the request
+    let options = { //data for the request
         params: params,
         resourcePath: resourcePathData.resourcePath,
         notFound: !resourcePathData.resourcePath,
         pathPars: resourcePathData.pathPars,
-        jsonpName: jsonpName ? jsonpName.replace(/\s/g, "") : null,
-        config: _lodash2["default"].clone(config) //handover a copy of the config object
+        jsonpName: (jsonpName ? jsonpName.replace(/\s/g, "") : null),
+        config: _.clone(config) //handover a copy of the config object
     };
 
     _generateResponse(req, res, options);
@@ -172,20 +148,20 @@ function _processRequest(resources, config, req, res) {
 
 function _generateResponse(req, res, options) {
 
-    if (req.method === "OPTIONS") {
-        //support preflight requests for CORS
+    if (req.method === "OPTIONS") { //support preflight requests for CORS
         options.responseData = {};
-        (0, _httpResponder.respond)(req, res, options);
-    } else {
-        _readRequestBody(req, options, function (err, body) {
+        httpRespond(req, res, options);
+    }
+    else {
+        _readRequestBody(req, options, (err, body) => {
 
             if (!err && body) {
                 req.body = body; //make it easy to access the body directly from the request object
                 options.requestBody = body;
             }
 
-            options.responseData = (0, _mockDataLoader.load)(req, options);
-            (0, _httpResponder.respond)(req, res, options);
+            options.responseData = loadMockedData(req, options);
+            httpRespond(req, res, options);
         });
     }
 }
@@ -199,12 +175,12 @@ function _readRequestBody(req, options, cb) {
 
         req.setEncoding("utf8");
 
-        req.on("data", function (chunk) {
+        req.on("data", (chunk) => {
             body += chunk;
         });
 
-        req.on("end", function () {
-            var data = body;
+        req.on("end", () => {
+            let data =body;
 
             try {
                 if (body && _isJson.test(req.headers["content-type"])) {
@@ -214,22 +190,22 @@ function _readRequestBody(req, options, cb) {
                 debug("read from request: ", data);
 
                 cb(null, data);
-            } catch (err) {
+            }
+            catch (err) {
                 debug("failed to parse request body as JSON");
                 cb(err);
             }
         });
-    } else {
+    }
+    else {
         cb();
     }
 }
 
 function _getQueryParams(req) {
-    var urlParts = _url2["default"].parse(req.url);
+    let urlParts = url.parse(req.url);
 
-    return _querystring2["default"].parse(urlParts.query);
+    return qs.parse(urlParts.query);
 }
 
-exports.start = start;
-exports.setDefaults = setDefaults;
-exports.restoreDefaults = restoreDefaults;
+export {start, setDefaults, restoreDefaults};

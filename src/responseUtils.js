@@ -1,8 +1,5 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 function respondWithFile(filePath, contentType, statusCode, statusMessage) {
     return {
         isFile: true,
@@ -15,25 +12,28 @@ function respondWithFile(filePath, contentType, statusCode, statusMessage) {
     };
 }
 
-function respondWithFailureRate(response, failRate, failCode, failMessage) {}
+function respondWithFailureRate(response, failRate, failCode, failMessage) {
+
+
+}
 
 var utils = {};
 
 Object.defineProperties(utils, {
     "respondWithFile": {
-        get: function get() {
+        get: function () {
             return respondWithFile;
         },
         enumerable: true
     },
 
     "respondWithFailureRate": {
-        get: function get() {
+        get: function () {
             return respondWithFailureRate;
         },
         enumerable: true
     }
 });
 
-exports["default"] = utils;
-module.exports = exports["default"];
+
+export default utils;

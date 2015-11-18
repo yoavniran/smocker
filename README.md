@@ -1,5 +1,7 @@
 # Smocker
 
+[![Coverage Status](https://coveralls.io/repos/yoavniran/smocker/badge.svg?branch=master&service=github)](https://coveralls.io/github/yoavniran/smocker?branch=master)
+
 * [Intro](#intro)
 * [Install](#install)
 * [API](#api)
@@ -30,13 +32,23 @@ A very simple HTTP server mocker loading mocked data from node modules.
 
 > start (config)
 
-Start a new instance of Smocker with the provided or default configuration. internally starts a new http server.
-Pass in a configuration object to override the one or more of the defaults (See the configuration section below for details).
+Start a new instance of Smocker with the provided or default configuration. Internally starts a new http server.
+Pass in a configuration object to override one or more of the defaults (See the [configuration](#config) section below for details).
+
+returns a Promise that's resolved with a function that's when called will stop the running HTTP server.
 
 > setDefaults (config)
 
-Changes the root defaults object across all instances.
+changes the root defaults object for all future instances.
 Use this method to update some or all of the defaults smocker uses when starting a new instance.
+
+returns a clone object of the current defaults.
+
+> restoreDefaults ()
+
+restores the defaults object used to its original state.
+
+returns a clone object of the restored defaults.
 
 <a id="config"/> 
 ## Configuration
@@ -53,7 +65,7 @@ you can pass in a configuration object with the following parameters:
 
 > **addCorsHeader** - whether to add the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) headers to the response (default: **true**)
 
-> **corsAllowedOrigin**  - the hosts to allow when CORS is enabled (default: **"*"**)
+> **corsAllowedOrigin**  - the hosts to allow when CORS is enabled (default: **" * "**)
 
 > **corsEchoRequestHeaders** - whether to echo the headers sent by a [preflight](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests) request as the allowed cross origin request headers (default: **true**)
 
@@ -74,12 +86,15 @@ you can pass in a configuration object with the following parameters:
 
 When the server starts it looks at the folder configured as the resources and uses the folder names as the paths for matching incoming requests.
 
-each folder name should be named after the resource path. for example, if the incoming request url is: "/api/orders/123" then the matching folder name should be: "api.orders.$"
+Each folder name should be named after the resource path. for example, if the incoming request url is: "/api/orders/123" then the matching folder name should be: "api.orders.$"
+
+The URL separator character ("/") is marked with a "." in the folder name. that is why a mocked URL For http://myserver.com/api/orders will have a matched folder named "api.orders".
 
 The '$' symbol marks a placeholder that will match any path part regardless of the value. So 
 "api.orders.$" will match incoming request "/api/orders/123" and "/api/orders/abc".
 
 Incoming requests are matched using the [request url](https://nodejs.org/docs/latest-v0.12.x/api/http.html#http_message_url). 
+
 
 <a id="mocks"/> 
 ## Mock Resources
@@ -207,7 +222,7 @@ The **respondWithFile** method has the following signature:
 
 > **statusCode** and **statusMessage** are optional and will default to the configuration
 
-Below is an example of a mock module returning a file:
+Below is an example of a mock module returning a file (randomly choosing between 4 image files):
 
 ``` javascript
 
@@ -222,6 +237,7 @@ module.exports = function (req, options, utils) {
 
 If the mock module's path is at: _<project_root>/test/resources/dynamic.image/get.js_ and assuming that the module that required smocker is at: _<project_root>/test/app.js_ then the image file(s) should be stored at: _<project_root>/test/files/_
 
+In case the URL of the binary file you wish to mock is using a file name for example: __http://myserver.com/images/dynamic.jpg__ then you should place the mock resource module at: _<project_root>/test/resources/images/dynamic..jpg_ - the double dot  ("..") allows Smocker to turn the mocked URL into a single dot at run time instead of switching the single dot into the separator character ("/").
 
 <a id="changelog">
 ## Change Log
@@ -234,4 +250,3 @@ If the mock module's path is at: _<project_root>/test/resources/dynamic.image/ge
 
 ### 0.1.0
 * First Release
-

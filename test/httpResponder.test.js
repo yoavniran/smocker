@@ -1,5 +1,6 @@
 var chai = require("chai"),
     expect = chai.expect,
+    sinon = require("sinon"),
     dirtyChai = require("dirty-chai"),
     sinonChai = require("sinon-chai"),
     stirrer = require("mocha-stirrer");
@@ -181,6 +182,44 @@ describe("http responder tests", function () {
             next();
         }
     });
+
+    cup.pour("should handle file response successfully - no parent", function () {
+        var responder = this.getRequired("responder");
+
+        responder.respond(this.pars.req, this.pars.res, {
+            responseData: {
+                filePath: this.pars.filePath,
+                headers: {
+                    "content-type": this.pars.imageType
+                },
+                isFile: true
+            },
+            config: {
+                headers: {"test": "123"}
+            }
+        });
+    }, {
+
+        befores: function (next) {
+            this.getStub("path").isAbsolute.returns(false);
+            this.getStub("path").dirname.returns(this.pars.parentDir);
+            this.getStub("path").join.returns(this.pars.absFilePath);
+            this.getStub("fs").stat.callsArgWith(1, null, {size: this.pars.fileSize});
+            this.getStub("fs").createReadStream.returns({pipe: this.spies.pipe});
+            next();
+        },
+        afters: function (next) {
+            expect(this.getStub("path").join).to.have.been.calledWith(sinon.match.string, this.pars.filePath);
+            var joinFirstArg = this.getStub("path").join.getCall(0).args[0];
+
+            var path = require("path");
+
+            expect(path.isAbsolute(joinFirstArg)).to.be.true();
+            expect(joinFirstArg).to.satisfy(function(val){return val.endsWith(path.sep + "lib")});
+            next();
+        }
+    });
+
 
     cup.pour("should handle file response with file not found", function () {
         var responder = this.getRequired("responder");

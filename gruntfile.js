@@ -3,6 +3,7 @@ module.exports = function (grunt) {
     require("time-grunt")(grunt);
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("grunt-babel");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-mocha-test");
@@ -14,15 +15,35 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
 
+        clean: {
+            lib: {
+                src: ["./lib/**/*"]
+            },
+            output: {
+                src: ["./output/**/*"]
+            },
+            all: {
+                src: ["./output/**/*", "./lib/**/*"]
+            }
+        },
+
+        "babel": {
+            options: {
+                sourceMap: false
+            },
+            dist: {
+                files: [
+                    {expand: true, src: "*.js", dest: "./lib", cwd: "./src/"}
+                ]
+            }
+        },
+
         jshint: {
             files: ["./lib/*.js", "./test/**/*.js"],
             options: {
                 jshintrc: ".jshintrc"
             }
         },
-
-
-        clean: ["./output/**/*"],
 
         copy: {
             test: {
@@ -63,26 +84,24 @@ module.exports = function (grunt) {
                 },
                 src: ["./output/coverage/test/smocker.tests.js"]
             }
-        }
-        //"travis-cov": {
-        //        options: {
-        //            reporter: "travis-cov"
-        //        },
-        //        src: ["./output/coverage/test/stirrer.tests.js"]
-        //    }
-        //},
-        //
-        //coveralls: {
-        //    options: {
-        //        // When true, grunt-coveralls will only print a warning rather than
-        //        // an error, to prevent CI builds from failing unnecessarily (e.g. if
-        //        // coveralls.io is down). Optional, defaults to false.
-        //        force: true
-        //    },
-        //    stirrerCoverage: {
-        //        src: "./output/coverage.lcov.txt"
-        //    }
-        //},
+        },
+        "travis-cov": {
+            options: {
+                reporter: "travis-cov"
+            },
+            src: ["./output/coverage/test/stirrer.tests.js"]
+        },
+        coveralls: {
+            options: {
+                // When true, grunt-coveralls will only print a warning rather than
+                // an error, to prevent CI builds from failing unnecessarily (e.g. if
+                // coveralls.io is down). Optional, defaults to false.
+                force: true
+            },
+            smockerCoverage: {
+                src: "./output/coverage.lcov.txt"
+            }
+        },
         //
         //releaseTask: {
         //    options: {
@@ -97,12 +116,13 @@ module.exports = function (grunt) {
 
     });
 
-    grunt.registerTask("test", ["mochaTest:test"]);
-    grunt.registerTask("localcov", ["clean", "blanket", "copy:test", "mochaTest:htmlcov"]);
-    //grunt.registerTask("coverage", ["clean", "blanket", "copy:test", "mochaTest:coverage", "mochaTest:htmlcov", "coveralls"]);
-    //grunt.registerTask("build", ["jshint", "test", "coverage", "mochaTest:travis-cov"]);
+    grunt.registerTask("trans", ["clean:lib", "babel:dist"]);
+    grunt.registerTask("test", ["trans", "mochaTest:test"]);
+    grunt.registerTask("localcov", ["clean:all", "babel:dist", "blanket", "copy:test", "mochaTest:htmlcov"]);
+    grunt.registerTask("coverage", ["clean:output", "blanket", "copy:test", "mochaTest:coverage", "mochaTest:htmlcov", "coveralls"]);
+    grunt.registerTask("build", ["jshint", "test", "coverage", "mochaTest:travis-cov"]);
 
-    grunt.registerTask("default", ["jshint"]); // , "test"]);
+    grunt.registerTask("default", ["jshint"]);
 
-    //grunt.registerTask("release", ["default", "releaseTask"])
+    //grunt.registerTask("repl");
 };
