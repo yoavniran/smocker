@@ -277,7 +277,7 @@ module.exports = function(req, options, utils){
 	
 	return utils.respondWithFailureRate({
 				response: {				
-					info: "foo  //the body of the response when successful
+					info: "foo"  //the body of the response when successful
 				},
 				statusCode: 201,
 			}, 
