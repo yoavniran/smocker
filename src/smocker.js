@@ -34,7 +34,7 @@ var _usedDefaults;
  *  config.okStatusMessage - the default status message to set on the response (default: "ok")
  *  config.readRequestBody - whether to read the body of incoming requests and pass it to the resource module (when using function form) (default true)
  *  config.cacheResponses - whether to cache the mocked modules after they are first loaded to improve performance. Value can be Boolean or a valid positive integer. If set to true will cache all modules. if set to a number will remove old items from cache as it fills up. (default: 50)
- *  config.allowFailureRate -;
+ *  config.allowFailureRate - globally control whether to allow failure rate responses or ignore it (relates the utils.respondWithFailureRate() helper) (default true)
  *
  *  @returns Promise - resolved with a function thats when called will stop the running http server.
  */
@@ -111,6 +111,7 @@ function _createInstance(config, resources) {
 
 	return server;
 }
+
 function _processRequest(instance, req, res) {
 
 	const {config, resources, runProcessors}  = instance,
@@ -150,6 +151,7 @@ function _generateResponse(req, res, options) {
 
 			options.runProcessors(req, res, mockedData, options) //run post-processors
 				.then((data)=> { //post-processors finished successfully
+						debug("smocker - post processing finished, will send respond to client");
 						options.responseData = data.responseData;
 						httpRespond(data.req, data.res, options);
 					},

@@ -1,5 +1,5 @@
 "use strict";
-require("../lib/index"); //set the baseline for coverage
+require("../output/lib/index"); //set the baseline for coverage
 //******************************************
 
 require("./promisifySinonStub"); //adds rejects/resolves methods to sinon stubs
@@ -15,5 +15,6 @@ require("./responseUtils.test");
 
 require("./mockProcessors.test");
 require("./fileProcessor.test");
+require("./failRateProcessor.test");
 
 require("./smocker.test");

@@ -15,7 +15,7 @@ describe("mock processors tests", function () {
             processor: stirrer.EMPTY
         },
         requires: [{
-            path: "../lib/mockProcessors",
+            path: "../output/lib/mockProcessors",
             options: {alias: "processors"}
         }],
         before: function () {

@@ -44,7 +44,7 @@ describe("file processor tests", function () {
             this.pars.res.setHeader = this.spies.setHeader
         },
         requires: [{
-            path: "../lib/mockProcessors/fileProcessor",
+            path: "../output/lib/mockProcessors/fileProcessor",
             options: {alias: "processor"}
         }]
     });

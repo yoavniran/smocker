@@ -41,7 +41,7 @@ describe("mock data loader tests", function () {
             fnForm: stirrer.EMPTY
         },
         requires: [{
-            path: "../lib/mockDataLoader",
+            path: "../output/lib/mockDataLoader",
             options: {alias: "dataLoader"}
         }]
     });

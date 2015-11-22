@@ -20,7 +20,7 @@ function respond(req, res, options) {
 
 function _respondToHttpMethod(req, res, options) {
 
-	let data = options.responseData.response || {};
+	const data = options.responseData.response || {};
 
 	options.data = JSON.stringify(data);
 	_respondToRequest(req, res, options);
@@ -30,7 +30,7 @@ function _respondToJsonP(req, res, options) {
 	debug("answering with jsonp response with cb: " + options.jsonpName);
 	res.setHeader("content-type", JS_TYPE);
 
-	const data = JSON.stringify(options.responseData.response);
+	const data = JSON.stringify((options.responseData.response || {}));
 	options.data = (options.jsonpName + "(\"" + data.replace(/"/g, "\\\"") + "\");");
 
 	_respondToRequest(req, res, options);
@@ -79,7 +79,7 @@ function _setCorsHeaders(req, res, options) {
 		let allowedHeaders = req.headers["access-control-request-headers"];
 
 		if (allowedHeaders) {
-			debug("setting cors allowed headers header: ", allowedHeaders);
+			debug("httpResponder - setting CORS allowed headers header: ", allowedHeaders);
 			res.setHeader("Access-Control-Allow-Headers", allowedHeaders);
 		}
 	}

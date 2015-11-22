@@ -18,7 +18,7 @@ describe("utils tests", function () {
             require: stirrer.EMPTY
         },
         requires: [{
-            path: "../lib/utils",
+            path: "../output/lib/utils",
             options: {alias: "utils"}}]
     });
 

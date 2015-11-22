@@ -22,7 +22,7 @@ describe("resources loader tests", function () {
             fileResource: "files.images.logo..jpg"
         },
         requires: [{
-            path: "../lib/resourcesLoader",
+            path: "../output/lib/resourcesLoader",
             options: {alias: "loader"}
         }]
     });

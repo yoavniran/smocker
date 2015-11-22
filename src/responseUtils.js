@@ -22,14 +22,14 @@ function respondWithFile(filePath, contentType, statusCode, statusMessage) {
 
 /**
  * Use method when the response should sometimes succeed and sometime fail
- * @param response the successful response
+ * @param successData the successful response object to use (what would normally be the module's returned object)
  * @param failRate determines the percentage of failed responses
  * @param failCode the code to use when failing (default: 500)
  * @param failMessage the message to use when failing (default: "failed due to fail-rate set up")
  * @returns {Object}
  */
-function respondWithFailureRate(response, failRate, failCode, failMessage) {
-	return _.extend({}, response, {
+function respondWithFailureRate(successData, failRate, failCode, failMessage) {
+	return _.extend({}, successData, {
 		dontCache: true,
 		failRateData: {
 			rate: failRate,

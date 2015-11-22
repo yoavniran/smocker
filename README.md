@@ -84,6 +84,8 @@ you can pass in a configuration object with the following parameters:
 
 > **cacheResponses** - whether to cache the mocked modules after they are first loaded to improve performance. Value can be Boolean or a valid positive integer. If set to true will cache all modules. if set to a number will remove old items from cache as it fills up (default: **50**)
 
+> **allowFailureRate** - globally control whether to allow failure rate responses or ignore it (using the utils.respondWithFailureRate()) (default: **true**)
+
 <a id="resnmatch"/> 
 ## Resources & Url Matching
 
@@ -108,7 +110,7 @@ So to match a GET request on "/api/orders/123" you should have the following fil
 In this case "get.js" should be a normal node module returning either a json object or a function that returns a json object.
 
 The returned object can have the following properties:
-
+<a id="validMockResponse"/>
 * **response**: the response body that will be returned to the client
 * **statusCode**: the code number that will be returned to the client (default: **200**)
 * **statusMessage**: the message that will be returned to the client (default: **ok**)
@@ -259,7 +261,7 @@ The **respondWithFailRate** method has the following signature:
 	respondWithFailureRate(response, failRate, failCode, failMessage)
 ```
 
-> **response** the successful response to use
+> **successData** the successful response object to use (what would normally be the module's returned object, can include: [see above](#validMockResponse))
 
 > **failRate** determines the percentage of failed responses (integer between 0 and 100)
 
@@ -274,7 +276,10 @@ Below is a code sample showing its usage:
 module.exports = function(req, options, utils){
 	
 	return utils.respondWithFailureRate({
-				success: true  //the body of the response when successful
+				response: {				
+					info: "foo  //the body of the response when successful
+				},
+				statusCode: 201,
 			}, 
 			90, //the failure rate = 90%
 			501, //the code to use when failing

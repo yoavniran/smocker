@@ -31,12 +31,12 @@ describe("smocker tests", function () {
             "serverListen": stirrer.EMPTY,
         },
         requires: [{
-            path: "../lib/smocker",
+            path: "../output/lib/smocker",
             options: {alias: "smocker"}
         }]
     });
 
-    cup.pour("test fail to load resources", asyncTester(function (done) {
+    cup.pour("should notify on failure to load resources", asyncTester(function (done) {
 
         var smocker = this.getRequired("smocker");
 
@@ -60,7 +60,7 @@ describe("smocker tests", function () {
         }
     });
 
-    cup.pour("test with absolute resources path", asyncTester(function (done) {
+    cup.pour("should cope with absolute resources path", asyncTester(function (done) {
 
         var smocker = this.getRequired("smocker");
 
@@ -90,7 +90,7 @@ describe("smocker tests", function () {
         }
     });
 
-    cup.pour("test with relative resources path", asyncTester(function (done) {
+    cup.pour("should cope with relative resources path", asyncTester(function (done) {
         var smocker = this.getRequired("smocker");
 
         smocker.start({
@@ -117,7 +117,7 @@ describe("smocker tests", function () {
         }
     });
 
-    cup.pour("test with different port", asyncTester(function (done) {
+    cup.pour("should use the config's different port", asyncTester(function (done) {
 
         var smocker = this.getRequired("smocker");
 
@@ -136,7 +136,7 @@ describe("smocker tests", function () {
         }
     });
 
-    cup.pour("test server close", asyncTester(function (done) {
+    cup.pour("close should close the server instance", asyncTester(function (done) {
 
         var smocker = this.getRequired("smocker");
 
@@ -155,7 +155,7 @@ describe("smocker tests", function () {
         }
     });
 
-    cup.pour("test GET request handling - no match", asyncTester(function (done) {
+    cup.pour("should handle GET request with no match", asyncTester(function (done) {
 
         var smocker = this.getRequired("smocker");
 
@@ -190,7 +190,7 @@ describe("smocker tests", function () {
         }
     });
 
-    cup.pour("test GET request handling - with match", asyncTester(function (done) {
+    cup.pour("should deliver GET request - with match", asyncTester(function (done) {
 
         var smocker = this.getRequired("smocker");
 
@@ -219,7 +219,7 @@ describe("smocker tests", function () {
         }
     });
 
-    cup.pour("test POST request handling with body", asyncTester(function (done) {
+    cup.pour("should deliver POST request with body", asyncTester(function (done) {
 
         var smocker = this.getRequired("smocker");
 
@@ -247,7 +247,6 @@ describe("smocker tests", function () {
             expect(processorsArgs[0]).to.equal(this.pars.req);
             expect(processorsArgs[1]).to.equal(this.pars.res);
             expect(processorsArgs[2]).to.equal(this.pars.getResponse);
-
             expect(processorsArgs[3].notFound).to.be.false();
             expect(processorsArgs[3].resourcePath).to.equal(this.pars.getResourcePath);
 
@@ -255,6 +254,57 @@ describe("smocker tests", function () {
         },
         pars: {
             body: "hello"
+        }
+    });
+
+    cup.pour("should cope with body parsing failing", asyncTester(function (done) {
+
+        var smocker = this.getRequired("smocker");
+
+        smocker.start({})
+            .then(function () {
+                done();
+            }, done);
+    }), {
+        befores: [setupBeforeForPost,
+            setupBeforeWithMatch,
+            function (next) {
+
+                this.pars.reqWithBody = {
+                    method: "PUT",
+                    url: this.pars.getUrl,
+                    setEncoding: this.spies.setEncoding,
+                    on: this.stubs.reqOn,
+                    headers: {"content-type": "test/json"}
+                };
+
+                this.getStub("http").createServer.returns({
+                    listen: this.pars.noop
+                }).callsArgWith(0, this.pars.reqWithBody, this.pars.res);
+
+                this.stubs.reqOn.callsArgWith(1, this.pars.body);
+                next();
+            }],
+        afters: function (next) {
+
+            var dataLoaderLoadOptionsArg = this.getStub("./mockDataLoader").load.getCall(0).args[1];
+            expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
+
+            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
+            expect(responderOptionsArg.requestBody).to.not.exist();
+
+            var processorsArgs = this.stubs.runProcessors.getCall(0).args;
+            expect(processorsArgs[0]).to.equal(this.pars.reqWithBody);
+            expect(processorsArgs[1]).to.equal(this.pars.res);
+            expect(processorsArgs[2]).to.equal(this.pars.getResponse);
+            expect(processorsArgs[3].notFound).to.be.false();
+            expect(processorsArgs[3].resourcePath).to.equal(this.pars.getResourcePath);
+
+            next();
+        },
+        pars: {
+            body: "aaa"
         }
     });
 

@@ -9,7 +9,7 @@ describe("response utils tests", function () {
     chai.use(sinonChai);
     chai.use(dirtyChai);
 
-    var resUtils = require("../lib/responseUtils");
+    var resUtils = require("../output/lib/responseUtils");
 
     it("should respond with file", function () {
 

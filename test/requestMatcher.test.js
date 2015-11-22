@@ -12,7 +12,7 @@ describe("request matcher tests", function () {
 
     var cup = stirrer.grind({
         requires: [{
-            path: "../lib/requestMatcher",
+            path: "../output/lib/requestMatcher",
             options: {alias: "matcher"}
         }]
     });

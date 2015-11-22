@@ -56,7 +56,7 @@ module.exports = function (grunt) {
 		blanket: {        //output the instrumented files
 			output: {
 				src: "./output/lib/",
-				dest: "./output/coverage/lib"
+				dest: "./output/coverage/output/lib"
 			}
 		},
 

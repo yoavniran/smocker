@@ -40,7 +40,7 @@ describe("http responder tests", function () {
             "pipe": stirrer.EMPTY
         },
         requires: [{
-            path: "../lib/httpResponder",
+            path: "../output/lib/httpResponder",
             options: {alias: "responder"}
         }],
         beforeEach: function () {
