@@ -1,5 +1,3 @@
-"use strict";
-
 import http from "http";
 import url from "url";
 import qs from "querystring";
@@ -10,30 +8,13 @@ import {load as loadResources} from "./resourcesLoader";
 import {load as loadMockedData} from "./mockDataLoader";
 import {respond as httpRespond} from "./httpResponder";
 import {match as matchRequest} from "./requestMatcher";
+import {create as createProcessors} from "./mockProcessors";
+import SERVER_DEFAULTS from "./serverDefaults";
 
 const debug = Debug("smocker"),
-    JSON_TYPE = "application/json",
-    _isJson = /\/json/;
+	_isJson = /\/json/;
 
-var _defaults = {
-    port: 9991,
-    requestPrefix: "",
-    resources: "./resources",
-    dynamicSymbol: "$",
-    addCorsHeader: true,
-    corsAllowedOrigin: "*",
-    corsEchoRequestHeaders: true,
-    headers: {
-        "content-type": JSON_TYPE
-    },
-    cbParName: "cb",
-    okStatusCode: 200,
-    okStatusMessage: "ok",
-    readRequestBody: true,
-    cacheResponses: 50,
-    allowFailureRate: true
-},
-    _usedDefaults;
+var _usedDefaults;
 
 /**
  * start a new instance of Smocker with the provided or default configuration.
@@ -53,29 +34,30 @@ var _defaults = {
  *  config.okStatusMessage - the default status message to set on the response (default: "ok")
  *  config.readRequestBody - whether to read the body of incoming requests and pass it to the resource module (when using function form) (default true)
  *  config.cacheResponses - whether to cache the mocked modules after they are first loaded to improve performance. Value can be Boolean or a valid positive integer. If set to true will cache all modules. if set to a number will remove old items from cache as it fills up. (default: 50)
+ *  config.allowFailureRate -;
  *
  *  @returns Promise - resolved with a function thats when called will stop the running http server.
  */
 function start(config) {
 
-    config = _.extend({}, _defaults, _usedDefaults, config);
+	config = _.extend({}, SERVER_DEFAULTS, _usedDefaults, config);
 
-    if (!path.isAbsolute(config.resources)) {
-        config.parent = module.parent.parent || module.parent; //if used relative path, try and use the module that required index.js or smocker.js directly as the parent
-    }
+	if (!path.isAbsolute(config.resources)) {
+		config.parent = module.parent.parent || module.parent; //if used relative path, try and use the module that required index.js or smocker.js directly as the parent
+	}
 
-    return new Promise((resolve, reject)=> {
+	return new Promise((resolve, reject)=> {
 
-        loadResources(config)
-            .then(_onResourcesLoaded.bind(null, config))
-            .then((server)=> {
-                resolve(_stop.bind(null, server));
-            })
-            .catch((err)=> {
-                console.error("Smocker - failed to load resources! ", err);
-                reject(err);
-            });
-    });
+		loadResources(config)
+			.then(_createInstance.bind(null, config))
+			.then((server)=> {
+				resolve(_stop.bind(null, server));
+			})
+			.catch((err)=> {
+				console.error("smocker - failed to load resources! ", err);// eslint-disable-line no-console
+				reject(err);
+			});
+	});
 }
 
 /**
@@ -85,8 +67,8 @@ function start(config) {
  * @returns Object - a clone object of the current defaults
  */
 function setDefaults(config) {
-    _usedDefaults = _.extend({}, _defaults, config);
-    return _.clone(_usedDefaults );
+	_usedDefaults = _.extend({}, SERVER_DEFAULTS, config);
+	return _.clone(_usedDefaults);
 }
 
 /**
@@ -94,9 +76,9 @@ function setDefaults(config) {
  *
  * @returns Object - a clone object of the restored defaults
  */
-function restoreDefaults(){
-    _usedDefaults = null;
-    return _.clone(_defaults);
+function restoreDefaults() {
+	_usedDefaults = null;
+	return _.clone(SERVER_DEFAULTS);
 }
 
 /**************************************************************
@@ -105,107 +87,123 @@ function restoreDefaults(){
 
 function _stop(server) {
 
-    if (server) {
-        debug("closing http server!");
-        server.close((err)=> {
-            debug("server close encountered an error: ", err);
-        });
-    }
+	if (server) {
+		debug("closing http server!");
+		server.close((err)=> {
+			debug("server close encountered an error: ", err);
+		});
+	}
 }
 
-function _onResourcesLoaded(config, resources) {
+function _createInstance(config, resources) {
 
-    debug("resources loaded, about to start http server");
+	debug("smocker - resources loaded - creating smocker instance");
 
-    const server = http.createServer(_processRequest.bind(null, resources, config));
+	const runProcessors = createProcessors(config);
+	const instance = {resources, config, runProcessors};
 
-    server.listen(config.port, () => {
-        debug("HTTP server listening on: " + config.port);
-    });
+	debug("smocker - about to start http server");
+	const server = http.createServer(_processRequest.bind(null, instance));
 
-    return server;
+	server.listen(config.port, () => {
+		debug("smocker - HTTP server listening on: " + config.port);
+	});
+
+	return server;
 }
+function _processRequest(instance, req, res) {
 
-function _processRequest(resources, config, req, res) {
+	const {config, resources, runProcessors}  = instance,
+		params = _getQueryParams(req),
+		resourcePathData = matchRequest(req, resources),
+		jsonpName = params[config.cbParName];
 
-    debug("incoming request - " + req.method + "::" + req.url);
+	let options = { //data for the request
+		params,
+		resourcePath: resourcePathData.resourcePath,
+		notFound: !resourcePathData.resourcePath,
+		pathPars: resourcePathData.pathPars,
+		jsonpName: (jsonpName ? jsonpName.replace(/\s/g, "") : null),
+		config: _.clone(config), //pass along a copy of the config object
+		runProcessors
+	};
 
-    const params = _getQueryParams(req),
-        resourcePathData = matchRequest(req, resources),
-        jsonpName = params[config.cbParName];
-
-    let options = { //data for the request
-        params: params,
-        resourcePath: resourcePathData.resourcePath,
-        notFound: !resourcePathData.resourcePath,
-        pathPars: resourcePathData.pathPars,
-        jsonpName: (jsonpName ? jsonpName.replace(/\s/g, "") : null),
-        config: _.clone(config) //handover a copy of the config object
-    };
-
-    _generateResponse(req, res, options);
+	debug("smocker - incoming request - " + req.method + "::" + req.url);
+	_generateResponse(req, res, options);
 }
 
 function _generateResponse(req, res, options) {
 
-    if (req.method === "OPTIONS") { //support preflight requests for CORS
-        options.responseData = {};
-        httpRespond(req, res, options);
-    }
-    else {
-        _readRequestBody(req, options, (err, body) => {
+	if (req.method === "OPTIONS") { //support preflight requests for CORS
+		options.responseData = {};
+		httpRespond(req, res, options);
+	}
+	else {
+		_readRequestBody(req, options, (err, body) => {
 
-            if (!err && body) {
-                req.body = body; //make it easy to access the body directly from the request object
-                options.requestBody = body;
-            }
+			if (!err && body) {
+				req.body = body; //make it easy to access the body directly from the request object
+				options.requestBody = body;
+			}
 
-            options.responseData = loadMockedData(req, options);
-            httpRespond(req, res, options);
-        });
-    }
+			let mockedData = loadMockedData(req, options);
+
+			options.runProcessors(req, res, mockedData, options) //run post-processors
+				.then((data)=> { //post-processors finished successfully
+						options.responseData = data.responseData;
+						httpRespond(data.req, data.res, options);
+					},
+					_failOnPostProcessors.bind(null, req, res, options));
+		});
+	}
 }
 
-function _readRequestBody(req, options, cb) {
+function _failOnPostProcessors(req, res, options, err) {
+	debug("smocker - Failed to run post-processors or encountered error with one of them", err);
+	options.notFound = true;
+	options.responseData = {statusCode: 500, statusMessage: "Smocker post-processors failed"};
+	httpRespond(req, res, options);
+}
 
-    var body = "";
+function _readRequestBody(req, options, cb) { //todo: move to a pre-processor
 
-    if (!options.readRequestBody && req.method !== "GET") {
-        debug("about to read body of request");
+	var body = "";
 
-        req.setEncoding("utf8");
+	if (!options.readRequestBody && req.method !== "GET") {
+		debug("about to read body of request");
 
-        req.on("data", (chunk) => {
-            body += chunk;
-        });
+		req.setEncoding("utf8");
 
-        req.on("end", () => {
-            let data =body;
+		req.on("data", (chunk) => {
+			body += chunk;
+		});
 
-            try {
-                if (body && _isJson.test(req.headers["content-type"])) {
-                    data = JSON.parse(body);
-                }
+		req.on("end", () => {
+			let data = body;
 
-                debug("read from request: ", data);
+			try {
+				if (body && _isJson.test(req.headers["content-type"])) {
+					data = JSON.parse(body);
+				}
 
-                cb(null, data);
-            }
-            catch (err) {
-                debug("failed to parse request body as JSON");
-                cb(err);
-            }
-        });
-    }
-    else {
-        cb();
-    }
+				debug("smocker - read from request: ", data);
+				cb(null, data);
+			}
+			catch (err) {
+				debug("smocker - failed to parse request body as JSON");
+				cb(err);
+			}
+		});
+	}
+	else {
+		cb();
+	}
 }
 
 function _getQueryParams(req) {
-    let urlParts = url.parse(req.url);
+	let urlParts = url.parse(req.url);
 
-    return qs.parse(urlParts.query);
+	return qs.parse(urlParts.query);
 }
 
 export {start, setDefaults, restoreDefaults};

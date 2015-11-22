@@ -17,15 +17,18 @@ describe("smocker tests", function () {
             defaultPort: 9991,
             defaultResources: "./resources",
             noop: function () {
-            }
+            },
+            res: {res: true},
+            resources: []
         },
         spies: {
             "serverClose": stirrer.EMPTY,
-            "serverListen": stirrer.EMPTY,
             "setEncoding": stirrer.EMPTY
         },
         stubs: {
-            reqOn: stirrer.EMPTY
+            reqOn: stirrer.EMPTY,
+            runProcessors: stirrer.EMPTY,
+            "serverListen": stirrer.EMPTY,
         },
         requires: [{
             path: "../lib/smocker",
@@ -71,6 +74,7 @@ describe("smocker tests", function () {
         befores: [
             setupBefore,
             function (next) {
+                this.stubs.serverListen.callsArg(1);
                 this.getStub("path").isAbsolute.returns(true);
                 next();
             }
@@ -81,7 +85,7 @@ describe("smocker tests", function () {
             var loadArgs = this.getStub("./resourcesLoader").load.getCall(0).args;
             expect(loadArgs[0].parent).to.not.exist();
 
-            expect(this.spies.serverListen).to.have.been.calledWith(this.pars.defaultPort);
+            expect(this.stubs.serverListen).to.have.been.calledWith(this.pars.defaultPort);
             next();
         }
     });
@@ -127,7 +131,7 @@ describe("smocker tests", function () {
     }), {
         befores: setupBefore,
         afters: function (next) {
-            expect(this.spies.serverListen).to.have.been.calledWith(this.pars.testPort);
+            expect(this.stubs.serverListen).to.have.been.calledWith(this.pars.testPort);
             next();
         }
     });
@@ -219,11 +223,10 @@ describe("smocker tests", function () {
 
         var smocker = this.getRequired("smocker");
 
-        smocker.start({
-            resources: ""
-        }).then(function () {
-            done();
-        }, done);
+        smocker.start({})
+            .then(function () {
+                done();
+            }, done);
     }), {
         befores: [setupBeforeForPost,
             setupBeforeWithMatch,
@@ -239,6 +242,14 @@ describe("smocker tests", function () {
             var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
             expect(responderOptionsArg.requestBody).to.equal(this.pars.body);
+
+            var processorsArgs = this.stubs.runProcessors.getCall(0).args;
+            expect(processorsArgs[0]).to.equal(this.pars.req);
+            expect(processorsArgs[1]).to.equal(this.pars.res);
+            expect(processorsArgs[2]).to.equal(this.pars.getResponse);
+
+            expect(processorsArgs[3].notFound).to.be.false();
+            expect(processorsArgs[3].resourcePath).to.equal(this.pars.getResourcePath);
 
             next();
         },
@@ -264,6 +275,34 @@ describe("smocker tests", function () {
         afters: function (next) {
             var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.responseData).to.be.empty();
+            next();
+        }
+    });
+
+    cup.pour("test success mock with failed post-processors", asyncTester(function (done) {
+
+        var smocker = this.getRequired("smocker");
+
+        smocker.start({
+            resources: ""
+        }).then(function () {
+            done();
+        }, done);
+
+    }), {
+        befores: [
+            setupBeforeForGet,
+            function (next) {
+                this.stubs.runProcessors.rejects(new Error("processors failed!"));
+                next();
+            }
+        ],
+        afters: function (next) {
+
+            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            expect(responderOptionsArg.notFound).to.be.true();
+            expect(responderOptionsArg.responseData.statusCode).to.equal(500);
+
             next();
         }
     });
@@ -298,11 +337,11 @@ describe("smocker tests", function () {
         befores: setupBefore,
         afters: function (next) {
 
-            var loadOptionsArg = this.getStub("./resourcesLoader").load.getCall(0).args[0];
+            var loadOptionsArg = this.getStub("./resourcesLoader").load.getCall(0).args[0]; //first call
             expect(loadOptionsArg.resources).to.equal(this.pars.newResources);
             expect(loadOptionsArg.port).to.equal(this.pars.newPort);
 
-            var loadOptionsArg = this.getStub("./resourcesLoader").load.getCall(1).args[0];
+            loadOptionsArg = this.getStub("./resourcesLoader").load.getCall(1).args[0]; //second call
             expect(loadOptionsArg.resources).to.equal(this.pars.defaultResources);
             expect(loadOptionsArg.port).to.equal(this.pars.defaultPort);
 
@@ -322,7 +361,7 @@ function asyncTester(fn) {
     "use strict";
     return function (done) {
         fn.call(this, function () {
-            setTimeout(done, 1);
+            setTimeout(done.apply(null, arguments), 1);
         });
     }
 }
@@ -331,7 +370,7 @@ function setupBefore(next) {
     this.getStub("./resourcesLoader").load.resolves([]);
 
     this.getStub("http").createServer.returns({
-        listen: this.spies.serverListen,
+        listen: this.stubs.serverListen,
         close: this.spies.serverClose
     });
 
@@ -351,22 +390,32 @@ function setupBeforeForOptions(next) {
 }
 
 function setupBeforeForMethod(method, next) {
-    this.getStub("./resourcesLoader").load.resolves([]);
+    this.getStub("./resourcesLoader").load.resolves(this.pars.resources);
 
     this.getStub("./requestMatcher").match.returns({
         resourcePath: null,
         pathPars: []
     });
 
-    this.getStub("http").createServer.returns({
-        listen: this.pars.noop
-    }).callsArgWith(0, {
+    this.getStub("./mockProcessors").create.returns(this.stubs.runProcessors);
+
+    this.pars.req = {
         method: method,
         url: this.pars.getUrl,
         setEncoding: this.spies.setEncoding,
         on: this.stubs.reqOn,
         headers: []
-    }, {});
+    };
+
+    this.getStub("http").createServer.returns({
+        listen: this.pars.noop
+    }).callsArgWith(0, this.pars.req, this.pars.res);
+
+    this.stubs.runProcessors.resolves({
+        responseData: this.pars.getResponse,
+        req: {},
+        res: {}
+    });
 
     this.getStub("url").parse.returns({query: ""});
     this.getStub("querystring").parse.returns([]);
@@ -376,6 +425,7 @@ function setupBeforeForMethod(method, next) {
 
 function setupBeforeWithMatch(next) {
     this.getStub("./mockDataLoader").load.returns(this.pars.getResponse);
+
     this.getStub("./requestMatcher").match.returns({
         resourcePath: this.pars.getResourcePath,
         pathPars: []

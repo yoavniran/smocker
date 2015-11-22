@@ -131,6 +131,9 @@ Finally, it receives a reference to a utils objects as the third argument. Curre
 
 > **respondWithFile** Use method when the response should be a file loaded from disk instead. See example [below](#fileResponse).
 
+> **respondWithFailureRate** Use method when the response should sometimes succeed and sometime fail. See example [below](#failrateResponse). The server uses a randomizing algorithm to try and get a more realistic failure  
+
+
 ### prefixing
 In case all of the requests being mocked start the same path part for example: 
 "/api/orders..." and "/api/users..." then the "/api" part can be anchored using the _requestPrefix_ configuration parameter. This will allow to name the resource folder "orders.$" instead of "api.oreders.$". Therefore the requestPrefix should have the value: "api"
@@ -238,9 +241,47 @@ module.exports = function (req, options, utils) {
 
 ```
 
+
 If the mock module's path is at: _<project_root>/test/resources/dynamic.image/get.js_ and assuming that the module that required smocker is at: _<project_root>/test/app.js_ then the image file(s) should be stored at: _<project_root>/test/files/_
 
 In case the URL of the binary file you wish to mock is using a file name for example: __http://myserver.com/images/dynamic.jpg__ then you should place the mock resource module at: _<project_root>/test/resources/images/dynamic..jpg_ - the double dot  ("..") allows Smocker to turn the mocked URL into a single dot at run time instead of switching the single dot into the separator character ("/").
+
+
+<a id="failrateResponse"/>
+## Fail-rate Responses
+
+At times you may wish to check how your client behaves when the API it calls fails. There different ways to achieve this but wouldn't it be nice to make it as realistic as possible. Using this utility, you can set (percentage-wise) how many of the calls to this API will fail.
+
+The **respondWithFailRate** method has the following signature: 
+
+``` javascript
+
+	respondWithFailureRate(response, failRate, failCode, failMessage)
+```
+
+> **response** the successful response to use
+
+> **failRate** determines the percentage of failed responses (integer between 0 and 100)
+
+> **failCode** the code to use when failing (default: 500)
+
+> **failMessage** the message to use when failing (default: "failed due to fail-rate set up") 
+
+Below is a code sample showing its usage:
+
+```javascript
+
+module.exports = function(req, options, utils){
+	
+	return utils.respondWithFailureRate({
+				success: true  //the body of the response when successful
+			}, 
+			90, //the failure rate = 90%
+			501, //the code to use when failing
+			"failed on purpose" //the message to use when failing
+};
+
+```
 
 <a id="changelog">
 ## Change Log

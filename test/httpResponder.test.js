@@ -154,7 +154,10 @@ describe("http responder tests", function () {
                 headers: {
                     "content-type": this.pars.imageType
                 },
-                isFile: true
+                isFile: true,
+                fileStream: {
+                    pipe: this.spies.pipe
+                }
             },
             config: {
                 headers: {"test": "123"},
@@ -164,70 +167,21 @@ describe("http responder tests", function () {
             }
         });
     }, {
-        befores: function (next) {
-            this.getStub("path").isAbsolute.returns(false);
-            this.getStub("path").dirname.returns(this.pars.parentDir);
-            this.getStub("path").join.returns(this.pars.absFilePath);
-            this.getStub("fs").stat.callsArgWith(1, null, {size: this.pars.fileSize});
-            this.getStub("fs").createReadStream.returns({pipe: this.spies.pipe});
-            next();
-        },
         afters: function (next) {
-            expect(this.getStub("path").isAbsolute).to.have.been.calledWith(this.pars.filePath);
-            expect(this.getStub("path").dirname).to.have.been.calledWith(this.pars.parentFileName);
-            expect(this.getStub("path").join).to.have.been.calledWith(this.pars.parentDir, this.pars.filePath);
-            expect(this.spies.setHeader).to.have.been.calledWith("content-length", this.pars.fileSize);
-            expect(this.spies.setHeader).to.have.been.calledWith("content-type", this.pars.imageType);
             expect(this.spies.pipe).to.have.been.calledWith(this.pars.res);
             next();
         }
     });
 
-    cup.pour("should handle file response successfully - no parent", function () {
-        var responder = this.getRequired("responder");
-
-        responder.respond(this.pars.req, this.pars.res, {
-            responseData: {
-                filePath: this.pars.filePath,
-                headers: {
-                    "content-type": this.pars.imageType
-                },
-                isFile: true
-            },
-            config: {
-                headers: {"test": "123"}
-            }
-        });
-    }, {
-
-        befores: function (next) {
-            this.getStub("path").isAbsolute.returns(false);
-            this.getStub("path").dirname.returns(this.pars.parentDir);
-            this.getStub("path").join.returns(this.pars.absFilePath);
-            this.getStub("fs").stat.callsArgWith(1, null, {size: this.pars.fileSize});
-            this.getStub("fs").createReadStream.returns({pipe: this.spies.pipe});
-            next();
-        },
-        afters: function (next) {
-            expect(this.getStub("path").join).to.have.been.calledWith(sinon.match.string, this.pars.filePath);
-            var joinFirstArg = this.getStub("path").join.getCall(0).args[0];
-
-            var path = require("path");
-
-            expect(path.isAbsolute(joinFirstArg)).to.be.true();
-            expect(joinFirstArg).to.satisfy(function(val){return val.endsWith(path.sep + "lib")});
-            next();
-        }
-    });
-
-
     cup.pour("should handle file response with file not found", function () {
         var responder = this.getRequired("responder");
 
         responder.respond(this.pars.req, this.pars.res, {
+            notFound: true,
             responseData: {
                 filePath: this.pars.filePath,
-                isFile: true
+                isFile: true,
+                fileStream: {}
             },
             config: {
                 headers: {"test": "123"},
@@ -237,13 +191,9 @@ describe("http responder tests", function () {
             }
         });
     }, {
-        befores: function (next) {
-            this.getStub("path").join.returns(this.pars.absFilePath);
-            this.getStub("fs").stat.callsArgWith(1, "err");
-            next();
-        },
         afters: [
             function (next) {
+                expect(this.spies.pipe).to.not.have.been.called();
                 expect(this.pars.res.statusCode).to.equal(404);
                 expect(this.pars.res.statusMessage).to.equal("not found");
                 this.pars.result = "";

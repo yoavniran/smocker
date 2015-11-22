@@ -1,10 +1,15 @@
 {
   "name": "smocker",
   "description": "very simple http server mocker - loading mocked data from pure node modules",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main": "./lib/index.js",
   "engines": {
     "node": ">=0.12"
+  },
+  "config": {
+    "travis-cov": {
+      "threshold": 95
+    }
   },
   "scripts": {
     "test": "grunt build --verbose"
@@ -44,8 +49,8 @@
     "grunt-blanket": "0.0.8",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-copy": "^0.8.1",
-    "grunt-contrib-jshint": "^0.11.3",
     "grunt-coveralls": "^1.0.0",
+    "grunt-eslint": "^17.3.1",
     "grunt-mocha-test": "^0.12.7",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "^1.0.0",

@@ -17,11 +17,12 @@ describe("utils tests", function () {
         stubs: {
             require: stirrer.EMPTY
         },
-        requires: [{path: "../lib/utils", options: {alias: "utils"}}]
+        requires: [{
+            path: "../lib/utils",
+            options: {alias: "utils"}}]
     });
 
     describe("dynamicLoad tests", function () {
-
 
         cup.pour("should return require result from parent", function () {
 
