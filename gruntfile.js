@@ -104,8 +104,9 @@ module.exports = function (grunt) {
 
 	grunt.registerTask("trans", ["clean:lib", "babel:dist"]);
 	grunt.registerTask("test", ["clean:outputLib", "babel:test", "mochaTest:test"]);
-	grunt.registerTask("localcov", ["clean:output", "babel:test", "blanket", "copy:test", "mochaTest:htmlcov"]);
-	grunt.registerTask("coverage", ["localcov",  "mochaTest:coverage", "coveralls"]); //grunt.registerTask("coverage", ["clean:output",  "babel:test", "blanket", "copy:test", "mochaTest:coverage", "mochaTest:htmlcov", "coveralls"]);
+	grunt.registerTask("prepareCoverage", ["clean:output", "babel:test", "blanket", "copy:test"]);
+	grunt.registerTask("localcov", ["prepareCoverage", "mochaTest:htmlcov"]);
+	grunt.registerTask("coverage", ["prepareCoverage",  "mochaTest:coverage", "coveralls"]);
 	grunt.registerTask("build", ["eslint", "coverage", "mochaTest:travis-cov", "trans"]);
 
 	grunt.registerTask("default", ["eslint", "test"]);
