@@ -291,6 +291,13 @@ module.exports = function(req, options, utils){
 <a id="changelog">
 ## Change Log
 
+### 0.3.0
+* added fail-rate response utility method ([details](#failrateResponse))
+* added post-processing pipe line (currently only internal)
+* code base now entirely written in ES6 (using Babel)
+* full test coverage (using [mocha-stirrer](https://www.npmjs.com/package/mocha-stirrer))
+* using es-list instead of jshint
+
 ### 0.2.1
 * support for binary file responses
 * test coverage up from 0 to ~75%
