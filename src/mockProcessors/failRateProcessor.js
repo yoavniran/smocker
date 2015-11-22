@@ -41,7 +41,7 @@ function _getResponse(requestCache, responseData, options, cb) {
 				newData = {
 					statusCode: code || DEFAULT_FAIL_CODE,
 					statusMessage: message || DEFAULT_FAIL_MSG
-				}
+				};
 			}
 		}
 		else {

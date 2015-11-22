@@ -83,14 +83,13 @@ module.exports = function (grunt) {
 					captureFile: "./output/coverage.html"
 				},
 				src: ["./output/coverage/test/smocker.tests.js"]
-			}
-		},
-
-		"travis-cov": {
-			options: {
-				reporter: "travis-cov"
 			},
-			src: ["./output/coverage/test/stirrer.tests.js"]
+			"travis-cov": {
+				options: {
+					reporter: "travis-cov"
+				},
+				src: ["./output/coverage/test/stirrer.tests.js"]
+			}
 		},
 
 		coveralls: {
@@ -107,7 +106,7 @@ module.exports = function (grunt) {
 	grunt.registerTask("test", ["clean:outputLib", "babel:test", "mochaTest:test"]);
 	grunt.registerTask("localcov", ["clean:output", "babel:test", "blanket", "copy:test", "mochaTest:htmlcov"]);
 	grunt.registerTask("coverage", ["localcov",  "mochaTest:coverage", "coveralls"]); //grunt.registerTask("coverage", ["clean:output",  "babel:test", "blanket", "copy:test", "mochaTest:coverage", "mochaTest:htmlcov", "coveralls"]);
-	grunt.registerTask("build", ["eslint", "test", "coverage", "mochaTest:travis-cov", "trans"]);
+	grunt.registerTask("build", ["eslint", "coverage", "mochaTest:travis-cov", "trans"]);
 
 	grunt.registerTask("default", ["eslint", "test"]);
 
