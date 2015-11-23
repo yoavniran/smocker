@@ -19,7 +19,6 @@ describe("mock processors tests", function () {
             options: {alias: "processors"}
         }],
         before: function () {
-            console.log("Stub aliases !!!!!!! ", this._mockAliases.stubs);
             this.getStub("mockProcessors/failRateProcessor").create.returns(this.stubs.processor);
             this.getStub("mockProcessors/fileProcessor").create.returns(this.stubs.processor);
 

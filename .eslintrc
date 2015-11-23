@@ -26,7 +26,13 @@
     "strict": [2,"global"],
     "eqeqeq": [2,"smart"],
     "curly": [2, "all"],
-    "no-lonely-if": 2
+    "no-lonely-if": 2,
+    "no-unused-expressions": 2,
+    "block-scoped-var": 2,
+    "complexity": [2, 7],
+    "consistent-return": 2,
+    "dot-notation": [2, { "allowKeywords": true }],
+    "no-alert": 2
   },
   "env": {
     "es6": true,

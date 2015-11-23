@@ -445,7 +445,6 @@ function setupBeforeForMethod(method, next) {
 		resourcePath: null,
 		pathPars: []
 	});
-	console.log("Stub aliases !!!!!!! ", this._mockAliases.stubs);
 	this.getStub("mockProcessors/index").create.returns(this.stubs.runProcessors);
 
 	this.pars.req = {
