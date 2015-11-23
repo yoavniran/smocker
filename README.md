@@ -1,5 +1,6 @@
 # Smocker
 
+[![Build Status](https://travis-ci.org/yoavniran/smocker.svg)](https://travis-ci.org/yoavniran/smocker)
 [![Coverage Status](https://coveralls.io/repos/yoavniran/smocker/badge.svg?branch=master&service=github)](https://coveralls.io/github/yoavniran/smocker?branch=master)
 [![npm version](https://badge.fury.io/js/smocker.svg)](http://badge.fury.io/js/smocker)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/8f1b6cae280d474c8b6f819f4a007d47)](https://www.codacy.com/app/yoavniran/smocker)
