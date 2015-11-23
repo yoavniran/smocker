@@ -51,7 +51,7 @@ describe("smocker tests", function () {
 
     }), {
         befores: function (next) {
-
+console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
             this.getStub("./resourcesLoader").load.rejects(this.pars.loadError);
             next();
         },

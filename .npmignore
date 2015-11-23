@@ -1,14 +1,11 @@
-.git*
+.git/
 *.iml
 *.log
 .DS_Store
 docs/
 examples/
 .coveralls.yml
-output/coverage.lcov.txt
 output/
-output/coverage/
-output/coverage.html
 .travis.yml
 .idea/
 idea/
