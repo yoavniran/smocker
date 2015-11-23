@@ -151,7 +151,7 @@ function _generateResponse(req, res, options) {
 
 			options.runProcessors(req, res, mockedData, options) //run post-processors
 				.then((data)=> { //post-processors finished successfully
-						debug("smocker - post processing finished, will send respond to client");
+						debug("smocker - post processing finished, will send response to client");
 						options.responseData = data.responseData;
 						httpRespond(data.req, data.res, options);
 					},
