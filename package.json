@@ -1,7 +1,7 @@
 {
   "name": "smocker",
   "description": "very simple http server mocker - loading mocked data from pure node modules",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "./lib/index.js",
   "engines": {
     "node": ">=0.12"
