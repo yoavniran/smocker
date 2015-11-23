@@ -2,8 +2,7 @@ var chai = require("chai"),
 	expect = chai.expect,
 	dirtyChai = require("dirty-chai"),
 	sinonChai = require("sinon-chai"),
-	stirrer = require("mocha-stirrer"),
-	_ = require("lodash");
+	stirrer = require("mocha-stirrer");
 
 describe("fail-rate processor tests", function () {
 	"use strict";

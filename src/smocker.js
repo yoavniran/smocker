@@ -8,7 +8,7 @@ import {load as loadResources} from "./resourcesLoader";
 import {load as loadMockedData} from "./mockDataLoader";
 import {respond as httpRespond} from "./httpResponder";
 import {match as matchRequest} from "./requestMatcher";
-import {create as createProcessors} from "./mockProcessors";
+import {create as createProcessors} from "./mockProcessors/index";
 import SERVER_DEFAULTS from "./serverDefaults";
 
 const debug = Debug("smocker"),

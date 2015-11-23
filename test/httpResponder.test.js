@@ -1,6 +1,5 @@
 var chai = require("chai"),
     expect = chai.expect,
-    sinon = require("sinon"),
     dirtyChai = require("dirty-chai"),
     sinonChai = require("sinon-chai"),
     stirrer = require("mocha-stirrer");

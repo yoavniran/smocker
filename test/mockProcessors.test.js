@@ -15,11 +15,11 @@ describe("mock processors tests", function () {
             processor: stirrer.EMPTY
         },
         requires: [{
-            path: "../output/lib/mockProcessors",
+            path: "../output/lib/mockProcessors/index",
             options: {alias: "processors"}
         }],
         before: function () {
-
+            console.log("Stub aliases !!!!!!! ", this._mockAliases.stubs);
             this.getStub("mockProcessors/failRateProcessor").create.returns(this.stubs.processor);
             this.getStub("mockProcessors/fileProcessor").create.returns(this.stubs.processor);
 
