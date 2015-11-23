@@ -51,8 +51,7 @@ describe("smocker tests", function () {
 
     }), {
         befores: function (next) {
-console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
-            this.getStub("./resourcesLoader").load.rejects(this.pars.loadError);
+            this.getStub("lib/resourcesLoader").load.rejects(this.pars.loadError);
             next();
         },
         pars: {
@@ -80,9 +79,9 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
             }
         ],
         afters: function (next) {
-            expect(this.getStub("./resourcesLoader").load).to.have.been.calledOnce();
+            expect(this.getStub("lib/resourcesLoader").load).to.have.been.calledOnce();
 
-            var loadArgs = this.getStub("./resourcesLoader").load.getCall(0).args;
+            var loadArgs = this.getStub("lib/resourcesLoader").load.getCall(0).args;
             expect(loadArgs[0].parent).to.not.exist();
 
             expect(this.stubs.serverListen).to.have.been.calledWith(this.pars.defaultPort);
@@ -108,9 +107,9 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
             }
         ],
         afters: function (next) {
-            expect(this.getStub("./resourcesLoader").load).to.have.been.calledOnce();
+            expect(this.getStub("lib/resourcesLoader").load).to.have.been.calledOnce();
 
-            var loadArgs = this.getStub("./resourcesLoader").load.getCall(0).args;
+            var loadArgs = this.getStub("lib/resourcesLoader").load.getCall(0).args;
             expect(loadArgs[0].parent).to.exist();
 
             next();
@@ -170,17 +169,17 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
         afters: function (next) {
 
             expect(this.getStub("url").parse).to.have.been.calledWith(this.pars.getUrl);
-            expect(this.getStub("./mockDataLoader").load).to.have.been.calledOnce();
+            expect(this.getStub("lib/mockDataLoader").load).to.have.been.calledOnce();
 
-            var dataLoaderLoadOptionsArg = this.getStub("./mockDataLoader").load.getCall(0).args[1],
-                dataLoaderLoadReqArg = this.getStub("./mockDataLoader").load.getCall(0).args[0];
+            var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1],
+                dataLoaderLoadReqArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[0];
 
             expect(dataLoaderLoadReqArg.url).to.equal(this.pars.getUrl);
             expect(dataLoaderLoadOptionsArg.notFound).to.be.true();
 
-            expect(this.getStub("./httpResponder").respond).to.have.been.calledOnce();
+            expect(this.getStub("lib/httpResponder").respond).to.have.been.calledOnce();
 
-            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.responseData).to.not.exist();
 
             next();
@@ -204,10 +203,10 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
             setupBeforeWithMatch],
         afters: function (next) {
 
-            var dataLoaderLoadOptionsArg = this.getStub("./mockDataLoader").load.getCall(0).args[1];
+            var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1];
             expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
 
             next();
@@ -236,10 +235,10 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
             }],
         afters: function (next) {
 
-            var dataLoaderLoadOptionsArg = this.getStub("./mockDataLoader").load.getCall(0).args[1];
+            var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1];
             expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
             expect(responderOptionsArg.requestBody).to.equal(this.pars.body);
 
@@ -287,10 +286,10 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
             }],
         afters: function (next) {
 
-            var dataLoaderLoadOptionsArg = this.getStub("./mockDataLoader").load.getCall(0).args[1];
+            var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1];
             expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
             expect(responderOptionsArg.requestBody).to.not.exist();
 
@@ -319,11 +318,11 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
     }), {
         befores: [setupBeforeForOptions,
             function (next) {
-                this.getStub("./requestMatcher").match.returns({});
+                this.getStub("lib/requestMatcher").match.returns({});
                 next();
             }],
         afters: function (next) {
-            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.responseData).to.be.empty();
             next();
         }
@@ -349,7 +348,7 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
         ],
         afters: function (next) {
 
-            var responderOptionsArg = this.getStub("./httpResponder").respond.getCall(0).args[2];
+            var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
             expect(responderOptionsArg.notFound).to.be.true();
             expect(responderOptionsArg.responseData.statusCode).to.equal(500);
 
@@ -387,11 +386,11 @@ console.log("!!!!!!!!!!!! cup stubs ::::: ", Object.keys(this.stubs));
         befores: setupBefore,
         afters: function (next) {
 
-            var loadOptionsArg = this.getStub("./resourcesLoader").load.getCall(0).args[0]; //first call
+            var loadOptionsArg = this.getStub("lib/resourcesLoader").load.getCall(0).args[0]; //first call
             expect(loadOptionsArg.resources).to.equal(this.pars.newResources);
             expect(loadOptionsArg.port).to.equal(this.pars.newPort);
 
-            loadOptionsArg = this.getStub("./resourcesLoader").load.getCall(1).args[0]; //second call
+            loadOptionsArg = this.getStub("lib/resourcesLoader").load.getCall(1).args[0]; //second call
             expect(loadOptionsArg.resources).to.equal(this.pars.defaultResources);
             expect(loadOptionsArg.port).to.equal(this.pars.defaultPort);
 
@@ -417,7 +416,7 @@ function asyncTester(fn) {
 }
 
 function setupBefore(next) {
-    this.getStub("./resourcesLoader").load.resolves([]);
+    this.getStub("lib/resourcesLoader").load.resolves([]);
 
     this.getStub("http").createServer.returns({
         listen: this.stubs.serverListen,
@@ -440,14 +439,14 @@ function setupBeforeForOptions(next) {
 }
 
 function setupBeforeForMethod(method, next) {
-    this.getStub("./resourcesLoader").load.resolves(this.pars.resources);
+    this.getStub("lib/resourcesLoader").load.resolves(this.pars.resources);
 
-    this.getStub("./requestMatcher").match.returns({
+    this.getStub("lib/requestMatcher").match.returns({
         resourcePath: null,
         pathPars: []
     });
 
-    this.getStub("./mockProcessors").create.returns(this.stubs.runProcessors);
+    this.getStub("lib/mockProcessors").create.returns(this.stubs.runProcessors);
 
     this.pars.req = {
         method: method,
@@ -474,9 +473,9 @@ function setupBeforeForMethod(method, next) {
 }
 
 function setupBeforeWithMatch(next) {
-    this.getStub("./mockDataLoader").load.returns(this.pars.getResponse);
+    this.getStub("lib/mockDataLoader").load.returns(this.pars.getResponse);
 
-    this.getStub("./requestMatcher").match.returns({
+    this.getStub("lib/requestMatcher").match.returns({
         resourcePath: this.pars.getResourcePath,
         pathPars: []
     });

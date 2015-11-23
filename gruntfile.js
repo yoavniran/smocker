@@ -46,7 +46,7 @@ module.exports = function (grunt) {
 		},
 
 		copy: {
-			test: {
+			testCoverage: {
 				files: [
 					{expand: true, src: "./test/**/*.js", dest: "./output/coverage/"}
 				]
@@ -104,7 +104,7 @@ module.exports = function (grunt) {
 
 	grunt.registerTask("trans", ["clean:lib", "babel:dist"]);
 	grunt.registerTask("test", ["clean:outputLib", "babel:test", "mochaTest:test"]);
-	grunt.registerTask("prepareCoverage", ["clean:output", "babel:test", "blanket", "copy:test"]);
+	grunt.registerTask("prepareCoverage", ["clean:output", "babel:test", "blanket", "copy:testCoverage"]);
 	grunt.registerTask("localcov", ["prepareCoverage", "mochaTest:htmlcov"]);
 	grunt.registerTask("coverage", ["prepareCoverage",  "mochaTest:coverage", "coveralls"]);
 	grunt.registerTask("build", ["test"]); // ["eslint", "coverage", "mochaTest:travis-cov", "trans"]);
