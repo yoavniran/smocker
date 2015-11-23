@@ -5,7 +5,9 @@ const debug = Debug("smocker"),
 	floor = Math.floor,
 	BATCH_SIZE = 100,
 	DEFAULT_FAIL_CODE = 500,
-	DEFAULT_FAIL_MSG = "failed due to fail-rate set up";
+	DEFAULT_FAIL_MSG = "failed due to fail-rate set up",
+	MAX_BYTE = 255,
+	HUNDRED = 100;
 
 function create(/*config*/) {
 	var requestCache = {};
@@ -84,7 +86,7 @@ function _getCallsValues(max, cb) {
 		if (!err) {
 			vals = [];
 			for (let i = 0; i < max; i++) {
-				vals.push(floor(bytes[i] / 255 * 100));
+				vals.push(floor(bytes[i] / MAX_BYTE * HUNDRED));
 			}
 		}
 		else {
