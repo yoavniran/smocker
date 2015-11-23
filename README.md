@@ -14,6 +14,7 @@
 * [Mock Resources](#mocks)
 * [Example](#example)
 * [Binary Responses](#binResponse)
+* [Fail-rate Responses](#failrateResponse)
 * [Change Log](#changelog)
 
 <a id="intro"/> 
@@ -253,8 +254,10 @@ In case the URL of the binary file you wish to mock is using a file name for exa
 <a id="failrateResponse"/>
 ## Fail-rate Responses
 
-At times you may wish to check how your client behaves when the API it calls fails. There different ways to achieve this but wouldn't it be nice to make it as realistic as possible. Using this utility, you can set (percentage-wise) how many of the calls to this API will fail.
-
+At times you may wish to check how your client behaves when the API it calls fails. There are different ways to achieve this but wouldn't it be nice to make it as realistic as possible? 
+Using this utility, you can set (percentage-wise) how many of the calls to this API will fail.
+The server will attempt to randomly respond either successfully or with a failure within the fail-rate specified.
+  
 The **respondWithFailRate** method has the following signature: 
 
 ``` javascript
