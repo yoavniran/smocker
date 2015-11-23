@@ -20,8 +20,8 @@ describe("mock processors tests", function () {
         }],
         before: function () {
 
-            this.getStub("lib/failRateProcessor").create.returns(this.stubs.processor);
-            this.getStub("lib/fileProcessor").create.returns(this.stubs.processor);
+            this.getStub("mockProcessors/failRateProcessor").create.returns(this.stubs.processor);
+            this.getStub("mockProcessors/fileProcessor").create.returns(this.stubs.processor);
 
             this.stubs.processor.callsArgWith(4, undefined);
         },
