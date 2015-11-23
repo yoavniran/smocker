@@ -51,9 +51,7 @@ describe("file processor tests", function () {
 
 	cup.pour("should successfully load file - with absolute file path", function (done) {
 
-		var processor = this.getRequired("processor");
-
-		var processorFn = processor.create();
+		var processorFn = this.getRequired("processor").create();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsNoParent, function (data) {
 			expect(data.fileStream).to.equal(cup.pars.fileStream);
@@ -78,9 +76,7 @@ describe("file processor tests", function () {
 
 	cup.pour("should successfully load file - with rel file path and with parent", function (done) {
 
-		var processor = this.getRequired("processor");
-
-		var processorFn = processor.create();
+		var processorFn = this.getRequired("processor").create();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsWithParent, function (data) {
 			expect(data.fileStream).to.equal(cup.pars.fileStream);
@@ -108,8 +104,7 @@ describe("file processor tests", function () {
 
 	cup.pour("should successfully load file - with rel file path and no parent", function (done) {
 
-		var processor = this.getRequired("processor");
-		var processorFn = processor.create();
+		var processorFn = this.getRequired("processor").create();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsNoParent, function (data) {
 			expect(data.fileStream).to.equal(cup.pars.fileStream);
@@ -132,7 +127,7 @@ describe("file processor tests", function () {
 			expect(this.getStub("path").join).to.have.been.calledWith(sinon.match.string, this.pars.responseData.filePath);
 
 			var path = require("path"),
-			 joinFirstArg = this.getStub("path").join.getCall(0).args[0],
+				joinFirstArg = this.getStub("path").join.getCall(0).args[0],
 				sep = (path.sep === "\\" ? "\\\\" : path.sep);
 
 			expect(joinFirstArg).to.match(new RegExp(sep + "lib" + sep + "mockProcessors$"));
@@ -140,10 +135,9 @@ describe("file processor tests", function () {
 		}
 	});
 
-	cup.pour("test file not found", function (done) {
+	cup.pour("should set not found on file not found", function (done) {
 
-		var processor = this.getRequired("processor");
-		var processorFn = processor.create();
+		var processorFn = this.getRequired("processor").create();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsNoParent, function (data) {
 			expect(data.fileStream).to.not.exist();
@@ -156,5 +150,29 @@ describe("file processor tests", function () {
 			this.getStub("fs").stat.callsArgWith(1, new Error("not found!"));
 			next();
 		}
+	});
+
+	cup.pour("should just continue if not isFile", function (done) {
+		var processorFn = this.getRequired("processor").create();
+
+		var options = {isFile: false, notFound: false};
+
+		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), options, function (data) {
+			expect(data.fileStream).to.not.exist();
+			expect(options.notFound).to.be.false();
+			done();
+		});
+	});
+
+	cup.pour("should just continue if already not found", function (done) {
+		var processorFn = this.getRequired("processor").create();
+
+		var options = {isFile: true, notFound: true};
+
+		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), options, function (data) {
+			expect(data.fileStream).to.not.exist();
+			expect(options.notFound).to.be.true();
+			done();
+		});
 	});
 });
