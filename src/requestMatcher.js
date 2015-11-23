@@ -1,3 +1,4 @@
+import _ from "lodash";
 import Debug  from "debug";
 const debug = Debug("smocker");
 
@@ -9,7 +10,7 @@ function match(req, resources) {
 			pathPars: []
 		};
 
-	resources.find ((res)=> {
+	_.find(resources,(res)=> { //cant use Array.find while supporting Node 0.12
 
 		let match = res.rgx.exec(reqUrl);
 
