@@ -7,7 +7,8 @@ const debug = Debug("smocker");
 function create(/*config*/) {
 	return (req, res, responseData, options, next) => {
 
-		if (options.isFile && !options.notFound) {
+		if (responseData.isFile && !options.notFound) {
+			debug("fileProcessor - responding with file to : " + req.url);
 			_attachFileStream(req, res, responseData, options, ()=> {
 				next(responseData);
 			});

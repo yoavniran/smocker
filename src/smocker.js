@@ -172,7 +172,7 @@ function _readRequestBody(req, options, cb) { //todo: move to a pre-processor
 	var body = "";
 
 	if (!options.readRequestBody && req.method !== "GET") {
-		debug("about to read body of request");
+		debug("smocker - about to read body of request");
 
 		req.setEncoding("utf8");
 

@@ -35,6 +35,7 @@ A very simple HTTP server mocker loading mocked data from node modules.
 <a id="api"/>
 ## API
 
+<a id="startMethod"/>
 > start (config)
 
 Start a new instance of Smocker with the provided or default configuration. Internally starts a new http server.
@@ -91,11 +92,11 @@ you can pass in a configuration object with the following parameters:
 <a id="resnmatch"/> 
 ## Resources & Url Matching
 
-When the server starts it looks at the folder configured as the resources and uses the folder names as the paths for matching incoming requests.
+When the server starts it looks at the folder configured as the resources and uses its sub-folders' names as the paths for matching incoming requests.
 
 Each folder name should be named after the resource path. for example, if the incoming request url is: "/api/orders/123" then the matching folder name should be: "api.orders.$"
 
-The URL separator character ("/") is marked with a "." in the folder name. that is why a mocked URL For http://myserver.com/api/orders will have a matched folder named "api.orders".
+The URL separator character ("/") is marked with a "." in the folder name. that is why a mocked URL For http://myserver.com/**api/orders** will have a matched folder named **"api.orders"**.
 
 The '$' symbol marks a placeholder that will match any path part regardless of the value. So 
 "api.orders.$" will match incoming request "/api/orders/123" and "/api/orders/abc".
@@ -109,9 +110,9 @@ Incoming requests are matched using the [request url](https://nodejs.org/docs/la
 Inside the resource folders a .js file should be placed named after the [method](https://nodejs.org/docs/latest-v0.12.x/api/http.html#http_message_method) the request used. 
 So to match a GET request on "/api/orders/123" you should have the following file at: **"resources/api.orders.$/get.js"**
 
-In this case "get.js" should be a normal node module returning either a json object or a function that returns a json object.
+In this case "get.js" should be a normal node module exporting either a json object or a function that returns a json object.
 
-The returned object can have the following properties:
+The exported object or object returned from the exported function can have the following properties:
 <a id="validMockResponse"/>
 * **response**: the response body that will be returned to the client
 * **statusCode**: the code number that will be returned to the client (default: **200**)
@@ -120,27 +121,27 @@ The returned object can have the following properties:
 
 Another option is to use the function form for the mocked resource. The function is expected to have the following signature: fn(req, info, utils) 
 
-In case a function is used, it should return the same object structure. 
+In case a function is used, it should return the same object structure as described [above](#validMockResponse). 
 
 The function will receive a reference to the incoming request (currently being handled) as the first argument. 
 
-It will also receive an info object as the seconds argument which contains:
+It will also receive an info object as the second argument which contains:
 
 * **params**: the request URL parameters of the incoming request as a key/val pair. 
-* **config**: the configuration passed to the start method. 
+* **config**: the configuration that was used when the instance [start](#startMethod) method was called. 
 * **pathPars**: an array containing values of any dynamic path part used within the request. For example if the resource is "api.orders.$" and the request URL is "/api/orders/123" then "123" will be the first item in the pathPars array.
-* **requestBody**: the body of the request if the request contained one and the __readRequestBody__ configuration parameter is set to true (default)
+* **requestBody**: the body of the request if the request contained one and the _readRequestBody_ configuration parameter is set to true (default).
 
 Finally, it receives a reference to a utils objects as the third argument. Currently the utils object has these methods:
 
-> **respondWithFile** Use method when the response should be a file loaded from disk instead. See example [below](#fileResponse).
+> **respondWithFile** Use method when the response should be a file loaded from disk instead of string/json. See example [below](#fileResponse).
 
-> **respondWithFailureRate** Use method when the response should sometimes succeed and sometime fail. See example [below](#failrateResponse). The server uses a randomizing algorithm to try and get a more realistic failure  
+> **respondWithFailureRate** Use method when the response should sometimes succeed and sometime fail. See example [below](#failrateResponse). The server uses a randomizing algorithm to try and get a more realistic failure experience. 
 
 
 ### prefixing
-In case all of the requests being mocked start the same path part for example: 
-"/api/orders..." and "/api/users..." then the "/api" part can be anchored using the _requestPrefix_ configuration parameter. This will allow to name the resource folder "orders.$" instead of "api.oreders.$". Therefore the requestPrefix should have the value: "api"
+When all of the requests being mocked start with the same path part for example: 
+"/api/orders..." and "/api/users..." then the "/api" part can be anchored using the _requestPrefix_ configuration parameter. This will allow to name the resource folder "orders.$" instead of "api.oreders.$". In this case the requestPrefix should have the value: "api"
 
 <a id="example"/> 
 ## Example
@@ -257,11 +258,12 @@ In case the URL of the binary file you wish to mock is using a file name for exa
 At times you may wish to check how your client behaves when the API it calls fails. There are different ways to achieve this but wouldn't it be nice to make it as realistic as possible? 
 Using this utility, you can set (percentage-wise) how many of the calls to this API will fail.
 The server will attempt to randomly respond either successfully or with a failure within the fail-rate specified.
+
+> _Responses with fail-rate enabled aren't cached_.
   
 The **respondWithFailRate** method has the following signature: 
 
 ``` javascript
-
 	respondWithFailureRate(response, failRate, failCode, failMessage)
 ```
 
@@ -280,8 +282,8 @@ Below is a code sample showing its usage:
 module.exports = function(req, options, utils){
 	
 	return utils.respondWithFailureRate({
-				response: {				
-					info: "foo"  //the body of the response when successful
+				response: { //the body of the response when successful				 
+					info: "foo"
 				},
 				statusCode: 201,
 			}, 
@@ -297,7 +299,7 @@ module.exports = function(req, options, utils){
 
 ### 0.3.0
 * added fail-rate response utility method ([details](#failrateResponse))
-* added post-processing pipe line (currently only internal)
+* added post-processing pipe line (internal only currently)
 * code base now entirely written in ES6 (using Babel)
 * full test coverage (using [mocha-stirrer](https://www.npmjs.com/package/mocha-stirrer))
 * using es-list instead of jshint

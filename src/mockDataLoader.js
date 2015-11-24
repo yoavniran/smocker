@@ -10,7 +10,7 @@ function load(req, options) {
 	var responseData;
 
 	if (!options.notFound) {
-		debug("about to load resource data from: " + options.resourcePath);
+		debug("mockDataLoader - about to load resource data from: " + options.resourcePath);
 
 		responseData = _getFromCache(options);
 

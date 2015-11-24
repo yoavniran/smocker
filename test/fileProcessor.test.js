@@ -18,10 +18,10 @@ describe("file processor tests", function () {
 			req: {},
 			res: {},
 			responseData: {
+				isFile: true,
 				filePath: "some/file"
 			},
 			optionsWithParent: {
-				isFile: true,
 				config: {
 					parent: {
 						filename: "/parent/path"
@@ -29,7 +29,6 @@ describe("file processor tests", function () {
 				}
 			},
 			optionsNoParent: {
-				isFile: true,
 				config: {}
 			},
 			fileStream: {pipe: true},
@@ -155,9 +154,9 @@ describe("file processor tests", function () {
 	cup.pour("should just continue if not isFile", function (done) {
 		var processorFn = this.getRequired("processor").create();
 
-		var options = {isFile: false, notFound: false};
+		var options = {notFound: false};
 
-		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), options, function (data) {
+		processorFn(this.pars.req, this.pars.res, {isFile: false}, options, function (data) {
 			expect(data.fileStream).to.not.exist();
 			expect(options.notFound).to.be.false();
 			done();
