@@ -10,7 +10,7 @@
 * [Install](#install)
 * [API](#api)
 * [Configuration](#configuration)
-* [Resources & Url Matching](#resource-url-matching)
+* [Resources & Url Matching](#resources--url-matching)
 * [Mock Resources](#mocks)
 * [Example](#example)
 * [Binary Responses](#binary-responses)
@@ -34,11 +34,10 @@ __Smocker relies on a simple folder and file naming convention so there is hardl
 
 ## API
 
-<a id="startMethod"/>
 > start (config)
 
 Start a new instance of Smocker with the provided or default configuration. Internally starts a new http server.
-Pass in a configuration object to override one or more of the defaults (See the [configuration](#config) section below for details).
+Pass in a configuration object to override one or more of the defaults (See the [configuration](#configuration) section below for details).
 
 returns a Promise that's resolved with a function that's when called will stop the running HTTP server.
 
@@ -101,7 +100,6 @@ The '$' symbol marks a placeholder that will match any path part regardless of t
 Incoming requests are matched using the [request url](https://nodejs.org/docs/latest-v0.12.x/api/http.html#http_message_url). 
 
 
-<a id="mocks"/> 
 ## Mock Resources
 
 Inside the resource folders a .js file should be placed named after the [method](https://nodejs.org/docs/latest-v0.12.x/api/http.html#http_message_method) the request used. 
@@ -110,7 +108,7 @@ So to match a GET request on "/api/orders/123" you should have the following fil
 In this case "get.js" should be a normal node module exporting either a json object or a function that returns a json object.
 
 The exported object or object returned from the exported function can have the following properties:
-<a id="validMockResponse"/>
+
 * **response**: the response body that will be returned to the client
 * **statusCode**: the code number that will be returned to the client (default: **200**)
 * **statusMessage**: the message that will be returned to the client (default: **ok**)
@@ -118,29 +116,28 @@ The exported object or object returned from the exported function can have the f
 
 Another option is to use the function form for the mocked resource. The function is expected to have the following signature: fn(req, info, utils) 
 
-In case a function is used, it should return the same object structure as described [above](#validMockResponse). 
+In case a function is used, it should return the same object structure as described [above](#mock-resources). 
 
 The function will receive a reference to the incoming request (currently being handled) as the first argument. 
 
 It will also receive an info object as the second argument which contains:
 
 * **params**: the request URL parameters of the incoming request as a key/val pair. 
-* **config**: the configuration that was used when the instance [start](#startMethod) method was called. 
+* **config**: the configuration that was used when the instance [start](#api) method was called. 
 * **pathPars**: an array containing values of any dynamic path part used within the request. For example if the resource is "api.orders.$" and the request URL is "/api/orders/123" then "123" will be the first item in the pathPars array.
 * **requestBody**: the body of the request if the request contained one and the _readRequestBody_ configuration parameter is set to true (default).
 
 Finally, it receives a reference to a utils objects as the third argument. Currently the utils object has these methods:
 
-> **respondWithFile** Use method when the response should be a file loaded from disk instead of string/json. See example [below](#fileResponse).
+> **respondWithFile** Use method when the response should be a file loaded from disk instead of string/json. See example [below](#binary-responses).
 
-> **respondWithFailureRate** Use method when the response should sometimes succeed and sometime fail. See example [below](#failrateResponse). The server uses a randomizing algorithm to try and get a more realistic failure experience. 
+> **respondWithFailureRate** Use method when the response should sometimes succeed and sometime fail. See example [below](#fail-rate-responses). The server uses a randomizing algorithm to try and get a more realistic failure experience. 
 
 
 ### prefixing
 When all of the requests being mocked start with the same path part for example: 
 "/api/orders..." and "/api/users..." then the "/api" part can be anchored using the _requestPrefix_ configuration parameter. This will allow to name the resource folder "orders.$" instead of "api.oreders.$". In this case the requestPrefix should have the value: "api"
 
-<a id="example"/> 
 ## Example
 call start() to start up the mock server:
 
@@ -157,6 +154,7 @@ smocker.start({
 
 ```
 
+### Responses
 Then in the folder called "resources" you can place the following structure:
 
 * resources
@@ -212,6 +210,33 @@ module.exports = function(req, info, utils){
 
 ```
 
+with function form you can respond with a promise:
+
+```javascript
+
+module.exports = function(req, info, utils){
+
+	return new Promise((resolve, reject)=>{
+		//... do your logic here
+		
+		//either resolve
+		resolve({
+			response: {
+				id: 123,
+                customer: 56333,
+                quantity: 2
+			}
+		});
+		
+		//or reject
+		//reject("something bad happened");
+	});
+};
+
+```
+
+> a rejected promise will be handled and a 500 error will be returned to the client
+
 ## Binary Responses
 
 At times you may wish to respond with a binary file rather than a text(typically JSON) response.
@@ -262,7 +287,7 @@ The **respondWithFailRate** method has the following signature:
 	respondWithFailureRate(response, failRate, failCode, failMessage)
 ```
 
-> **successData** the successful response object to use (what would normally be the module's returned object, can include: [see above](#validMockResponse))
+> **successData** the successful response object to use (what would normally be the module's returned object, can include: [see above](#responses))
 
 > **failRate** determines the percentage of failed responses (integer between 0 and 100)
 
@@ -296,7 +321,7 @@ module.exports = function(req, options, utils){
 * added .editorconfig
 
 ### 0.3.0
-* added fail-rate response utility method ([details](#failrateResponse))
+* added fail-rate response utility method ([details](#fail-rate-responses))
 * added post-processing pipe line (internal only currently)
 * code base now entirely written in ES6 (using Babel)
 * full test coverage (using [mocha-stirrer](https://www.npmjs.com/package/mocha-stirrer))

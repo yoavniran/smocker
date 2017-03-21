@@ -1,4 +1,4 @@
-var chai = require("chai"),
+const chai = require("chai"),
 	expect = chai.expect,
 	dirtyChai = require("dirty-chai"),
 	sinonChai = require("sinon-chai"),
@@ -19,7 +19,8 @@ describe("smocker tests", function () {
 			noop: function () {
 			},
 			res: {res: true},
-			resources: []
+			resources: [],
+			modulePromiseRejReason: "promise failed!"
 		},
 		spies: {
 			"serverClose": stirrer.EMPTY,
@@ -38,7 +39,7 @@ describe("smocker tests", function () {
 
 	cup.pour("should notify on failure to load resources", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({})
 			.then(function () {
@@ -61,11 +62,11 @@ describe("smocker tests", function () {
 
 	cup.pour("should cope with absolute resources path", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
-				"resources": "/test/resources"
-			})
+			"resources": "/test/resources"
+		})
 			.then(function (stopHandle) {
 				expect(stopHandle).to.be.a("function");
 			}, done).then(done, done);
@@ -81,7 +82,7 @@ describe("smocker tests", function () {
 		afters: function (next) {
 			expect(this.getStub("lib/resourcesLoader")).to.have.been.calledOnce();
 
-			var loadArgs = this.getStub("lib/resourcesLoader").getCall(0).args;
+			const loadArgs = this.getStub("lib/resourcesLoader").getCall(0).args;
 			expect(loadArgs[0].parent).to.not.exist();
 
 			expect(this.stubs.serverListen).to.have.been.calledWith(this.pars.defaultPort);
@@ -90,11 +91,11 @@ describe("smocker tests", function () {
 	});
 
 	cup.pour("should cope with relative resources path", asyncTester(function (done) {
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
-				"resources": "./test/resources"
-			})
+			"resources": "./test/resources"
+		})
 			.then(function (stopHandle) {
 				expect(stopHandle).to.be.a("function");
 			}, done).then(done, done);
@@ -109,7 +110,7 @@ describe("smocker tests", function () {
 		afters: function (next) {
 			expect(this.getStub("lib/resourcesLoader")).to.have.been.calledOnce();
 
-			var loadArgs = this.getStub("lib/resourcesLoader").getCall(0).args;
+			const loadArgs = this.getStub("lib/resourcesLoader").getCall(0).args;
 			expect(loadArgs[0].parent).to.exist();
 
 			next();
@@ -118,12 +119,12 @@ describe("smocker tests", function () {
 
 	cup.pour("should use the config's different port", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
-				"resources": "./test/resources",
-				"port": this.pars.testPort
-			})
+			"resources": "./test/resources",
+			"port": this.pars.testPort
+		})
 			.then(function (stopHandle) {
 				expect(stopHandle).to.be.a("function");
 			}, done).then(done, done);
@@ -137,12 +138,12 @@ describe("smocker tests", function () {
 
 	cup.pour("close should close the server instance", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
-				"resources": "./test/resources",
-				"port": this.pars.testPort
-			})
+			"resources": "./test/resources",
+			"port": this.pars.testPort
+		})
 			.then(function (stopHandle) {
 				stopHandle();
 			}, done).then(done, done);
@@ -171,7 +172,7 @@ describe("smocker tests", function () {
 			expect(this.getStub("url").parse).to.have.been.calledWith(this.pars.getUrl);
 			expect(this.getStub("lib/mockDataLoader")).to.have.been.calledOnce();
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1],
+			const dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1],
 				dataLoaderLoadReqArg = this.getStub("lib/mockDataLoader").getCall(0).args[0];
 
 			expect(dataLoaderLoadReqArg.url).to.equal(this.pars.getUrl);
@@ -179,7 +180,7 @@ describe("smocker tests", function () {
 
 			expect(this.getStub("lib/httpResponder")).to.have.been.calledOnce();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
+			const responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.not.exist();
 
 			next();
@@ -191,7 +192,7 @@ describe("smocker tests", function () {
 
 	cup.pour("should deliver GET request - with match", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
 			resources: ""
@@ -203,10 +204,10 @@ describe("smocker tests", function () {
 			setupBeforeWithMatch],
 		afters: function (next) {
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
+			const dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
 			expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
+			const responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
 
 			next();
@@ -220,7 +221,7 @@ describe("smocker tests", function () {
 
 	cup.pour("should deliver POST request with body", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({})
 			.then(function () {
@@ -235,14 +236,14 @@ describe("smocker tests", function () {
 			}],
 		afters: function (next) {
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
+			const dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
 			expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
+			const responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
 			expect(responderOptionsArg.requestBody).to.equal(this.pars.body);
 
-			var processorsArgs = this.stubs.runProcessors.getCall(0).args;
+			const processorsArgs = this.stubs.runProcessors.getCall(0).args;
 			expect(processorsArgs[0]).to.equal(this.pars.req);
 			expect(processorsArgs[1]).to.equal(this.pars.res);
 			expect(processorsArgs[2]).to.equal(this.pars.getResponse);
@@ -258,7 +259,7 @@ describe("smocker tests", function () {
 
 	cup.pour("should cope with body parsing failing", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({})
 			.then(function () {
@@ -286,14 +287,14 @@ describe("smocker tests", function () {
 			}],
 		afters: function (next) {
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
+			const dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
 			expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
+			const responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
 			expect(responderOptionsArg.requestBody).to.not.exist();
 
-			var processorsArgs = this.stubs.runProcessors.getCall(0).args;
+			const processorsArgs = this.stubs.runProcessors.getCall(0).args;
 			expect(processorsArgs[0]).to.equal(this.pars.reqWithBody);
 			expect(processorsArgs[1]).to.equal(this.pars.res);
 			expect(processorsArgs[2]).to.equal(this.pars.getResponse);
@@ -308,7 +309,7 @@ describe("smocker tests", function () {
 	});
 
 	cup.pour("test OPTIONS request handling", asyncTester(function (done) {
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
 			resources: ""
@@ -322,7 +323,7 @@ describe("smocker tests", function () {
 				next();
 			}],
 		afters: function (next) {
-			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
+			const responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.be.empty();
 			next();
 		}
@@ -330,7 +331,7 @@ describe("smocker tests", function () {
 
 	cup.pour("test success mock with failed post-processors", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
 			resources: ""
@@ -348,7 +349,7 @@ describe("smocker tests", function () {
 		],
 		afters: function (next) {
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
+			const responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.notFound).to.be.true();
 			expect(responderOptionsArg.responseData.statusCode).to.equal(500);
 
@@ -356,11 +357,34 @@ describe("smocker tests", function () {
 		}
 	});
 
+	cup.pour("test mock with rejected promise", asyncTester(function (done) {
+
+		const smocker = this.getRequired("smocker");
+
+		smocker.start({
+			resources: ""
+		}).then(function () {
+			done();
+		}, done);
+	}), {
+		befores: [setupBeforeForGet,
+			function (next) {
+				this.getStub("lib/mockDataLoader").rejects(this.pars.modulePromiseRejReason);
+				next();
+			}],
+		afters: function (next) {
+			const responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
+			expect(responderOptionsArg.notFound).to.be.true();
+			expect(responderOptionsArg.responseData.statusCode).to.equal(500);
+			next();
+		}
+	});
+
 	cup.pour("test set and restore defaults on smocker", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
-		var newDefaults = smocker.setDefaults({
+		let newDefaults = smocker.setDefaults({
 			port: this.pars.newPort,
 			resources: this.pars.newResources
 		});
@@ -369,14 +393,14 @@ describe("smocker tests", function () {
 		expect(newDefaults.port).to.equal(this.pars.newPort);
 
 		smocker.start().then(function () {
-				smocker.restoreDefaults();
-				newDefaults = smocker.setDefaults({});
+			smocker.restoreDefaults();
+			newDefaults = smocker.setDefaults({});
 
-				expect(newDefaults).to.exist();
-				expect(newDefaults.port).to.equal(this.pars.defaultPort);
+			expect(newDefaults).to.exist();
+			expect(newDefaults.port).to.equal(this.pars.defaultPort);
 
-				return smocker.start();
-			}.bind(this), done)
+			return smocker.start();
+		}.bind(this), done)
 			.then(function () {
 				done();
 			}, done);
@@ -386,7 +410,7 @@ describe("smocker tests", function () {
 		befores: setupBefore,
 		afters: function (next) {
 
-			var loadOptionsArg = this.getStub("lib/resourcesLoader").getCall(0).args[0]; //first call
+			let loadOptionsArg = this.getStub("lib/resourcesLoader").getCall(0).args[0]; //first call
 			expect(loadOptionsArg.resources).to.equal(this.pars.newResources);
 			expect(loadOptionsArg.port).to.equal(this.pars.newPort);
 
@@ -436,7 +460,7 @@ function setupBeforeForMethod(method, next) {
 
 	this.getStub("mockProcessors/index").returns(this.stubs.runProcessors);
 
-	this.getStub("lib/mockDataLoader").resolves({});  //returns(Promise.resolve({}));
+	this.getStub("lib/mockDataLoader").resolves({});
 
 	this.pars.req = {
 		method: method,
