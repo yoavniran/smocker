@@ -1,5 +1,3 @@
-"use strict";
-
 import _ from "lodash";
 import Debug from "debug";
 
@@ -85,4 +83,4 @@ export default (req, res, options) => {
 	else {
 		_respondToHttpMethod(req, res, options);
 	}
-}
+};

@@ -1,5 +1,3 @@
-"use strict";
-
 import Debug from "debug";
 import _ from "lodash";
 import Lru from "lru-cache";

@@ -9,15 +9,14 @@
 * [Intro](#intro)
 * [Install](#install)
 * [API](#api)
-* [Configuration](#config)
-* [Resources & Url Matching](#resnmatch)
+* [Configuration](#configuration)
+* [Resources & Url Matching](#resource-url-matching)
 * [Mock Resources](#mocks)
 * [Example](#example)
-* [Binary Responses](#binResponse)
-* [Fail-rate Responses](#failrateResponse)
-* [Change Log](#changelog)
+* [Binary Responses](#binary-responses)
+* [Fail-rate Responses](#fail-rate-responses)
+* [Change Log](#change-log)
 
-<a id="intro"/> 
 ## Intro
 
 A very simple HTTP server mocker loading mocked data from node modules.
@@ -29,12 +28,10 @@ A very simple HTTP server mocker loading mocked data from node modules.
 
 __Smocker relies on a simple folder and file naming convention so there is hardly any code needed to get started.__
 
-<a id="install"/> 
 ## Install
 
 > _npm install smocker --save-dev_
 
-<a id="api"/>
 ## API
 
 <a id="startMethod"/>
@@ -58,7 +55,6 @@ restores the defaults object used to its original state.
 
 returns a clone object of the restored defaults.
 
-<a id="config"/> 
 ## Configuration
 
 you can pass in a configuration object with the following parameters:
@@ -91,7 +87,6 @@ you can pass in a configuration object with the following parameters:
 
 > **allowFailureRate** - globally control whether to allow failure rate responses or ignore it (using the utils.respondWithFailureRate()) (default: **true**)
 
-<a id="resnmatch"/> 
 ## Resources & Url Matching
 
 When the server starts it looks at the folder configured as the resources and uses its sub-folders' names as the paths for matching incoming requests.
@@ -217,7 +212,6 @@ module.exports = function(req, info, utils){
 
 ```
 
-<a id="binResponse"/>
 ## Binary Responses
 
 At times you may wish to respond with a binary file rather than a text(typically JSON) response.
@@ -254,7 +248,6 @@ If the mock module's path is at: _<project_root>/test/resources/dynamic.image/ge
 In case the URL of the binary file you wish to mock is using a file name for example: __http://myserver.com/images/dynamic.jpg__ then you should place the mock resource module at: _<project_root>/test/resources/images/dynamic..jpg_ - the double dot  ("..") allows Smocker to turn the mocked URL into a single dot at run time instead of switching the single dot into the separator character ("/").
 
 
-<a id="failrateResponse"/>
 ## Fail-rate Responses
 
 At times you may wish to check how your client behaves when the API it calls fails. There are different ways to achieve this but wouldn't it be nice to make it as realistic as possible? 
@@ -296,8 +289,11 @@ module.exports = function(req, options, utils){
 
 ```
 
-<a id="changelog">
 ## Change Log
+
+### 1.0.0
+* added possibility to return promise from function form module
+* added .editorconfig
 
 ### 0.3.0
 * added fail-rate response utility method ([details](#failrateResponse))

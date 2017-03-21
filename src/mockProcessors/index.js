@@ -1,5 +1,3 @@
-"use strict";
-
 import createFailRateProcessor from "./failRateProcessor";
 import createFileProcessor from "./fileProcessor";
 

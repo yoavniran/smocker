@@ -1,5 +1,3 @@
-"use strict";
-
 import http from "http";
 import url from "url";
 import qs from "querystring";

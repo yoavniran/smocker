@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Use method when the response should be a file loaded from disk instead
  * @param filePath the path to load the file from

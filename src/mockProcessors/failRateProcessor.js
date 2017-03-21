@@ -1,5 +1,3 @@
-"use strict";
-
 import Debug from "debug";
 import crypto from "crypto";
 
@@ -97,4 +95,4 @@ function _getCallsValues(max, cb) {
 export default (/*config*/) =>{
 	const requestCache = {};
 	return _getProcessor(requestCache);
-}
+};
