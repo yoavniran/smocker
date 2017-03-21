@@ -58,7 +58,7 @@ describe("fail-rate processor tests", function () {
 
 	cup.pour("should return fail response data when in fail rate", function (done) {
 
-		var runProcessor = this.getRequired("processor").create();
+		var runProcessor = this.getRequired("processor")();
 
 		runProcessor(this.pars.req, this.pars.res, this.pars.responseData, this.pars.options,
 			function (data) {
@@ -81,7 +81,7 @@ describe("fail-rate processor tests", function () {
 
 	cup.pour("should return same response when not in fail rate", function (done) {
 
-		var runProcessor = this.getRequired("processor").create();
+		var runProcessor = this.getRequired("processor")();
 
 		runProcessor(this.pars.req, this.pars.res, this.pars.responseData, this.pars.options,
 			function (data) {
@@ -116,7 +116,7 @@ describe("fail-rate processor tests", function () {
 
 	cup.pour("should return fail response data with defaults if code or message no supplied in fail data", function (done) {
 
-		var runProcessor = this.getRequired("processor").create();
+		var runProcessor = this.getRequired("processor")();
 
 		runProcessor(this.pars.req, this.pars.res, this.pars.responseDataDefs, this.pars.options,
 			function (data) {
@@ -139,7 +139,7 @@ describe("fail-rate processor tests", function () {
 
 	cup.pour("should return same response when fail rate data not supplied", function (done) {
 
-		var runProcessor = this.getRequired("processor").create();
+		var runProcessor = this.getRequired("processor")();
 
 		runProcessor(this.pars.req, this.pars.res, this.pars.responseDataNoFail, this.pars.options,
 			function (data) {
@@ -165,7 +165,7 @@ describe("fail-rate processor tests", function () {
 	});
 
 	cup.pour("should return same response when config.allowFailureRate set to false", function (done) {
-			var runProcessor = this.getRequired("processor").create();
+			var runProcessor = this.getRequired("processor")();
 
 			runProcessor(this.pars.req, this.pars.res, this.pars.responseData, this.pars.optionsNoFail,
 				function (data) {
@@ -193,7 +193,7 @@ describe("fail-rate processor tests", function () {
 
 	cup.pour("should return same response if randomBytes fails", function (done) {
 
-		var runProcessor = this.getRequired("processor").create();
+		var runProcessor = this.getRequired("processor")();
 
 		runProcessor(this.pars.req, this.pars.res, this.pars.responseData, this.pars.options,
 			function (data) {

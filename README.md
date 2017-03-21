@@ -27,6 +27,8 @@ A very simple HTTP server mocker loading mocked data from node modules.
  * supports CORS for easy use during development 
  * supports jsonp
 
+__Smocker relies on a simple folder and file naming convention so there is hardly any code needed to get started.__
+
 <a id="install"/> 
 ## Install
 

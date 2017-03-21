@@ -10,7 +10,7 @@ describe("smocker tests", function () {
 	chai.use(sinonChai);
 	chai.use(dirtyChai);
 
-	var cup = stirrer.grind({
+	const cup = stirrer.grind({
 		restirForEach: true,
 		pars: {
 			testPort: 2222,
@@ -42,7 +42,7 @@ describe("smocker tests", function () {
 
 		smocker.start({})
 			.then(function () {
-					done(new Error("shouldnt have resolved successfully"))
+					done(new Error("shouldnt have resolved successfully"));
 				},
 				function (reason) {
 					expect(reason).to.equal(this.pars.loadError);
@@ -51,7 +51,7 @@ describe("smocker tests", function () {
 
 	}), {
 		befores: function (next) {
-			this.getStub("lib/resourcesLoader").load.rejects(this.pars.loadError);
+			this.getStub("lib/resourcesLoader").rejects(this.pars.loadError);
 			next();
 		},
 		pars: {
@@ -79,9 +79,9 @@ describe("smocker tests", function () {
 			}
 		],
 		afters: function (next) {
-			expect(this.getStub("lib/resourcesLoader").load).to.have.been.calledOnce();
+			expect(this.getStub("lib/resourcesLoader")).to.have.been.calledOnce();
 
-			var loadArgs = this.getStub("lib/resourcesLoader").load.getCall(0).args;
+			var loadArgs = this.getStub("lib/resourcesLoader").getCall(0).args;
 			expect(loadArgs[0].parent).to.not.exist();
 
 			expect(this.stubs.serverListen).to.have.been.calledWith(this.pars.defaultPort);
@@ -107,9 +107,9 @@ describe("smocker tests", function () {
 			}
 		],
 		afters: function (next) {
-			expect(this.getStub("lib/resourcesLoader").load).to.have.been.calledOnce();
+			expect(this.getStub("lib/resourcesLoader")).to.have.been.calledOnce();
 
-			var loadArgs = this.getStub("lib/resourcesLoader").load.getCall(0).args;
+			var loadArgs = this.getStub("lib/resourcesLoader").getCall(0).args;
 			expect(loadArgs[0].parent).to.exist();
 
 			next();
@@ -156,7 +156,7 @@ describe("smocker tests", function () {
 
 	cup.pour("should handle GET request with no match", asyncTester(function (done) {
 
-		var smocker = this.getRequired("smocker");
+		const smocker = this.getRequired("smocker");
 
 		smocker.start({
 			resources: ""
@@ -169,17 +169,17 @@ describe("smocker tests", function () {
 		afters: function (next) {
 
 			expect(this.getStub("url").parse).to.have.been.calledWith(this.pars.getUrl);
-			expect(this.getStub("lib/mockDataLoader").load).to.have.been.calledOnce();
+			expect(this.getStub("lib/mockDataLoader")).to.have.been.calledOnce();
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1],
-				dataLoaderLoadReqArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[0];
+			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1],
+				dataLoaderLoadReqArg = this.getStub("lib/mockDataLoader").getCall(0).args[0];
 
 			expect(dataLoaderLoadReqArg.url).to.equal(this.pars.getUrl);
 			expect(dataLoaderLoadOptionsArg.notFound).to.be.true();
 
-			expect(this.getStub("lib/httpResponder").respond).to.have.been.calledOnce();
+			expect(this.getStub("lib/httpResponder")).to.have.been.calledOnce();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
+			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.not.exist();
 
 			next();
@@ -203,10 +203,10 @@ describe("smocker tests", function () {
 			setupBeforeWithMatch],
 		afters: function (next) {
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1];
+			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
 			expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
+			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
 
 			next();
@@ -235,10 +235,10 @@ describe("smocker tests", function () {
 			}],
 		afters: function (next) {
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1];
+			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
 			expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
+			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
 			expect(responderOptionsArg.requestBody).to.equal(this.pars.body);
 
@@ -286,10 +286,10 @@ describe("smocker tests", function () {
 			}],
 		afters: function (next) {
 
-			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").load.getCall(0).args[1];
+			var dataLoaderLoadOptionsArg = this.getStub("lib/mockDataLoader").getCall(0).args[1];
 			expect(dataLoaderLoadOptionsArg.notFound).to.be.false();
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
+			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.equal(this.pars.getResponse);
 			expect(responderOptionsArg.requestBody).to.not.exist();
 
@@ -318,11 +318,11 @@ describe("smocker tests", function () {
 	}), {
 		befores: [setupBeforeForOptions,
 			function (next) {
-				this.getStub("lib/requestMatcher").match.returns({});
+				this.getStub("lib/requestMatcher").returns({});
 				next();
 			}],
 		afters: function (next) {
-			var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
+			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.responseData).to.be.empty();
 			next();
 		}
@@ -348,7 +348,7 @@ describe("smocker tests", function () {
 		],
 		afters: function (next) {
 
-			var responderOptionsArg = this.getStub("lib/httpResponder").respond.getCall(0).args[2];
+			var responderOptionsArg = this.getStub("lib/httpResponder").getCall(0).args[2];
 			expect(responderOptionsArg.notFound).to.be.true();
 			expect(responderOptionsArg.responseData.statusCode).to.equal(500);
 
@@ -386,11 +386,11 @@ describe("smocker tests", function () {
 		befores: setupBefore,
 		afters: function (next) {
 
-			var loadOptionsArg = this.getStub("lib/resourcesLoader").load.getCall(0).args[0]; //first call
+			var loadOptionsArg = this.getStub("lib/resourcesLoader").getCall(0).args[0]; //first call
 			expect(loadOptionsArg.resources).to.equal(this.pars.newResources);
 			expect(loadOptionsArg.port).to.equal(this.pars.newPort);
 
-			loadOptionsArg = this.getStub("lib/resourcesLoader").load.getCall(1).args[0]; //second call
+			loadOptionsArg = this.getStub("lib/resourcesLoader").getCall(1).args[0]; //second call
 			expect(loadOptionsArg.resources).to.equal(this.pars.defaultResources);
 			expect(loadOptionsArg.port).to.equal(this.pars.defaultPort);
 
@@ -403,20 +403,8 @@ describe("smocker tests", function () {
 	});
 });
 
-//need this because tests here test code with promises and the promise swallows any assertion error so we break out
-//from the promise flow by wrapping the stirrer done method setTimeout
-//todo: move to mocha-stirrer for other projects to benefit from
-function asyncTester(fn) {
-	"use strict";
-	return function (done) {
-		fn.call(this, function () {
-			setTimeout(done.apply(null, arguments), 1);
-		});
-	}
-}
-
 function setupBefore(next) {
-	this.getStub("lib/resourcesLoader").load.resolves([]);
+	this.getStub("lib/resourcesLoader").resolves([]);
 
 	this.getStub("http").createServer.returns({
 		listen: this.stubs.serverListen,
@@ -439,13 +427,16 @@ function setupBeforeForOptions(next) {
 }
 
 function setupBeforeForMethod(method, next) {
-	this.getStub("lib/resourcesLoader").load.resolves(this.pars.resources);
+	this.getStub("lib/resourcesLoader").resolves(this.pars.resources);
 
-	this.getStub("lib/requestMatcher").match.returns({
+	this.getStub("lib/requestMatcher").returns({
 		resourcePath: null,
 		pathPars: []
 	});
-	this.getStub("mockProcessors/index").create.returns(this.stubs.runProcessors);
+
+	this.getStub("mockProcessors/index").returns(this.stubs.runProcessors);
+
+	this.getStub("lib/mockDataLoader").resolves({});  //returns(Promise.resolve({}));
 
 	this.pars.req = {
 		method: method,
@@ -472,9 +463,9 @@ function setupBeforeForMethod(method, next) {
 }
 
 function setupBeforeWithMatch(next) {
-	this.getStub("lib/mockDataLoader").load.returns(this.pars.getResponse);
+	this.getStub("lib/mockDataLoader").returns(Promise.resolve(this.pars.getResponse));
 
-	this.getStub("lib/requestMatcher").match.returns({
+	this.getStub("lib/requestMatcher").returns({
 		resourcePath: this.pars.getResourcePath,
 		pathPars: []
 	});

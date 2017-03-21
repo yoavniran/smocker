@@ -1,3 +1,5 @@
+"use strict";
+
 import Debug from "debug";
 import crypto from "crypto";
 
@@ -8,11 +10,6 @@ const debug = Debug("smocker"),
 	DEFAULT_FAIL_MSG = "failed due to fail-rate set up",
 	MAX_BYTE = 255,
 	HUNDRED = 100;
-
-function create(/*config*/) {
-	var requestCache = {};
-	return _getProcessor(requestCache);
-}
 
 function _getProcessor(requestCache) {
 	return (req, res, responseData, options, next) => {
@@ -97,4 +94,7 @@ function _getCallsValues(max, cb) {
 	});
 }
 
-export {create};
+export default (/*config*/) =>{
+	const requestCache = {};
+	return _getProcessor(requestCache);
+}

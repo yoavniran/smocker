@@ -1,14 +1,16 @@
+"use strict";
+
 import http from "http";
 import url from "url";
 import qs from "querystring";
 import path from "path";
 import _  from "lodash";
 import Debug  from "debug";
-import {load as loadResources} from "./resourcesLoader";
-import {load as loadMockedData} from "./mockDataLoader";
-import {respond as httpRespond} from "./httpResponder";
-import {match as matchRequest} from "./requestMatcher";
-import {create as createProcessors} from "./mockProcessors/index";
+import loadResources from "./resourcesLoader";
+import loadMockedData from "./mockDataLoader";
+import httpRespond from "./httpResponder";
+import matchRequest from "./requestMatcher";
+import createProcessors from "./mockProcessors/index";
 import SERVER_DEFAULTS from "./serverDefaults";
 
 const debug = Debug("smocker"),
@@ -46,14 +48,13 @@ function start(config) {
 		config.parent = module.parent.parent || module.parent; //if used relative path, try and use the module that required index.js or smocker.js directly as the parent
 	}
 
-	return new Promise((resolve, reject)=> {
-
+	return new Promise((resolve, reject) => {
 		loadResources(config)
 			.then(_createInstance.bind(null, config))
-			.then((server)=> {
+			.then((server) => {
 				resolve(_stop.bind(null, server));
 			})
-			.catch((err)=> {
+			.catch((err) => {
 				console.error("smocker - failed to load resources! ", err);// eslint-disable-line no-console
 				reject(err);
 			});
@@ -89,7 +90,7 @@ function _stop(server) {
 
 	if (server) {
 		debug("closing http server!");
-		server.close((err)=> {
+		server.close((err) => {
 			debug("server close encountered an error: ", err);
 		});
 	}
@@ -147,15 +148,15 @@ function _generateResponse(req, res, options) {
 				options.requestBody = body;
 			}
 
-			let mockedData = loadMockedData(req, options);
-
-			options.runProcessors(req, res, mockedData, options) //run post-processors
-				.then((data)=> { //post-processors finished successfully
-						debug("smocker - post processing finished, will send response to client");
-						options.responseData = data.responseData;
-						httpRespond(data.req, data.res, options);
-					},
-					_failOnPostProcessors.bind(null, req, res, options));
+			loadMockedData(req, options)
+				.then((data) =>
+					options.runProcessors(req, res, data, options) //run post-processors
+						.then((data) => { //post-processors finished successfully
+								debug("smocker - post processing finished, will send response to client");
+								options.responseData = data.responseData;
+								httpRespond(data.req, data.res, options);
+							},
+							_failOnPostProcessors.bind(null, req, res, options)));
 		});
 	}
 }

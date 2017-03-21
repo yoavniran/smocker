@@ -1,20 +1,14 @@
-import {create as failRateCreator} from "./failRateProcessor";
-import {create as fileResponseCreator} from "./fileProcessor";
+"use strict";
 
-function create(config) {
-	const processors = [
-		failRateCreator(config),
-		fileResponseCreator(config)];
+import createFailRateProcessor from "./failRateProcessor";
+import createFileProcessor from "./fileProcessor";
 
-	return _getProcessingLogic(processors);
-}
+const _getProcessingLogic = (processors) =>
+	(req, res, responseData, options) => { //will be run for every response
 
-function _getProcessingLogic(processors) {
-	return (req, res, responseData, options) => { //will be run for every response
+		const runningProcessors = processors.slice(); //get a copy of processors
 
-		const runningProcessors = processors.slice();
-
-		return new Promise((resolve)=> {
+		return new Promise((resolve) => {
 
 			const next = (data) => {
 				responseData = data || responseData;
@@ -23,7 +17,7 @@ function _getProcessingLogic(processors) {
 
 			const runNext = () => {
 				if (runningProcessors.length > 0) {
-					const processor = runningProcessors.pop();
+					const processor = runningProcessors.pop(); //take out the next processor
 					processor(req, res, responseData, options, next);
 				}
 				else {
@@ -34,6 +28,9 @@ function _getProcessingLogic(processors) {
 			runNext();
 		});
 	};
-}
 
-export {create};
+export default (config) =>
+	_getProcessingLogic([
+		createFailRateProcessor(config),
+		createFileProcessor(config)
+	]);

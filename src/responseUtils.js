@@ -1,4 +1,4 @@
-import _ from "lodash";
+"use strict";
 
 /**
  * Use method when the response should be a file loaded from disk instead
@@ -8,17 +8,15 @@ import _ from "lodash";
  * @param statusMessage
  * @returns {Object}
  */
-function respondWithFile(filePath, contentType, statusCode, statusMessage) {
-	return {
-		isFile: true,
-		filePath: filePath,
-		headers: {
-			"content-type": contentType
-		},
-		statusCode: statusCode,
-		statusMessage: statusMessage
-	};
-}
+const respondWithFile = (filePath, contentType, statusCode, statusMessage) => ({
+	isFile: true,
+	filePath: filePath,
+	headers: {
+		"content-type": contentType
+	},
+	statusCode: statusCode,
+	statusMessage: statusMessage
+});
 
 /**
  * Use method when the response should sometimes succeed and sometime fail
@@ -28,29 +26,29 @@ function respondWithFile(filePath, contentType, statusCode, statusMessage) {
  * @param failMessage the message to use when failing (default: "failed due to fail-rate set up")
  * @returns {Object}
  */
-function respondWithFailureRate(successData, failRate, failCode, failMessage) {
-	return _.extend({}, successData, {
-		dontCache: true,
-		failRateData: {
-			rate: failRate,
-			code: failCode,
-			message: failMessage
-		}
-	});
-}
+const respondWithFailureRate = (successData, failRate, failCode, failMessage) => ({
+	...successData,
+	dontCache: true,
+	failRateData: {
+		rate: failRate,
+		code: failCode,
+		message: failMessage
+	}
+});
 
-var utils = {};
+
+const utils = {};
 
 Object.defineProperties(utils, {
 	"respondWithFile": {
-		get: function () {
+		get() {
 			return respondWithFile;
 		},
 		enumerable: true
 	},
 
 	"respondWithFailureRate": {
-		get: function () {
+		get() {
 			return respondWithFailureRate;
 		},
 		enumerable: true

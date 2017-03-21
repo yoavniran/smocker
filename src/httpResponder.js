@@ -1,22 +1,10 @@
+"use strict";
+
 import _ from "lodash";
 import Debug from "debug";
 
 const JS_TYPE = "application/javascript",
 	debug = Debug("smokcer");
-
-function respond(req, res, options) {
-
-	if (options.notFound) {
-		debug("request doesnt have a matching resource");
-		_respondToRequest(req, res, options);
-	}
-	else if (options.jsonpName) {
-		_respondToJsonP(req, res, options);
-	}
-	else {
-		_respondToHttpMethod(req, res, options);
-	}
-}
 
 function _respondToHttpMethod(req, res, options) {
 
@@ -85,4 +73,16 @@ function _setCorsHeaders(req, res, options) {
 	}
 }
 
-export {respond};
+export default (req, res, options) => {
+
+	if (options.notFound) {
+		debug("request doesnt have a matching resource");
+		_respondToRequest(req, res, options);
+	}
+	else if (options.jsonpName) {
+		_respondToJsonP(req, res, options);
+	}
+	else {
+		_respondToHttpMethod(req, res, options);
+	}
+}

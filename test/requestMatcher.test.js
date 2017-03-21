@@ -22,7 +22,7 @@ describe("request matcher tests", function () {
         var matcher = this.getRequired("matcher");
         var path = "api.test";
 
-        var result = matcher.match({url: "/api/test/123", method: "POST"}, [{rgx: /\/api\/test(?:\/?)([^\\/\\s\\?]*)/, path: path}]);
+        var result = matcher({url: "/api/test/123", method: "POST"}, [{rgx: /\/api\/test(?:\/?)([^\\/\\s\\?]*)/, path: path}]);
 
         expect(result).to.exist();
         expect(result.resourcePath).to.equal(path + "/post.js");
@@ -33,7 +33,7 @@ describe("request matcher tests", function () {
         var matcher = this.getRequired("matcher");
         var path = "api.test";
 
-        var result = matcher.match({url: "/orders/test/123", method: "POST"}, [{rgx: /\/api\/test(?:\/?)([^\\/\\s\\?]*)/, path: path}]);
+        var result = matcher({url: "/orders/test/123", method: "POST"}, [{rgx: /\/api\/test(?:\/?)([^\\/\\s\\?]*)/, path: path}]);
 
         expect(result).to.exist();
         expect(result.resourcePath).to.be.null();

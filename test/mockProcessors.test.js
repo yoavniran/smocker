@@ -19,8 +19,8 @@ describe("mock processors tests", function () {
             options: {alias: "processors"}
         }],
         before: function () {
-            this.getStub("mockProcessors/failRateProcessor").create.returns(this.stubs.processor);
-            this.getStub("mockProcessors/fileProcessor").create.returns(this.stubs.processor);
+            this.getStub("mockProcessors/failRateProcessor").returns(this.stubs.processor);
+            this.getStub("mockProcessors/fileProcessor").returns(this.stubs.processor);
 
             this.stubs.processor.callsArgWith(4, undefined);
         },
@@ -33,7 +33,7 @@ describe("mock processors tests", function () {
     cup.pour("test processing - processors return undefined", function (done) {
 
         var processors = this.getRequired("processors");
-        var run = processors.create();
+        var run = processors();
 
         run({req: true}, {res: true}, {data: 123}, {})
             .then(function (data) {
@@ -50,7 +50,7 @@ describe("mock processors tests", function () {
     cup.pour("test processing - processors return response data", asyncTester(function (done) {
 
         var processors = this.getRequired("processors");
-        var run = processors.create();
+        var run = processors();
 
         run({req: true}, {res: true}, {data: 123}, {})
             .then(function (data) {

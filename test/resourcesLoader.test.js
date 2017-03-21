@@ -19,6 +19,7 @@ describe("resources loader tests", function () {
             },
             simpleResource: "orders.users",
             pathResource: "campaigns.target.$",
+	        twoPathResource: "campaigns.target.$.field.$",
             fileResource: "files.images.logo..jpg"
         },
         requires: [{
@@ -31,7 +32,7 @@ describe("resources loader tests", function () {
 
         var loader = this.getRequired("loader");
 
-        var p = loader.load(this.pars.config);
+        var p = loader(this.pars.config);
 
         expect(p).to.exist();
 
@@ -54,12 +55,12 @@ describe("resources loader tests", function () {
     cup.pour("should succeed to convert a path with path par", function (done) {
         var loader = this.getRequired("loader");
 
-        loader.load(this.pars.config) //, function (err, resources) {
+        loader(this.pars.config)
             .then(function (resources) {
                 var resource = resources[0];
 
                 expect(resource.path).to.equal("bla/bla/campaigns.target.$");
-                expect(resource.rgx.source).to.equal("\\/myPrfx\\/campaigns\\/target(?:\\/?)([^\\\\/\\s\\?]*)");
+                expect(resource.rgx.source).to.equal("\\/myPrfx\\/campaigns\\/target(?:\\/?)([^\\\\\\/\\s\\?]*)");
             }, done).then(done, done);
     }, {
         befores: function (next) {
@@ -68,11 +69,28 @@ describe("resources loader tests", function () {
         }
     });
 
+	cup.pour("should succeed to convert a path with two path par", function (done) {
+		var loader = this.getRequired("loader");
+
+		loader(this.pars.config)
+			.then(function (resources) {
+				var resource = resources[0];
+
+				expect(resource.path).to.equal("bla/bla/campaigns.target.$.field.$");
+				expect(resource.rgx.source).to.equal("\\/myPrfx\\/campaigns\\/target(?:\\/?)([^\\\\\\/\\s\\?]*)\\/field(?:\\/?)([^\\\\\\/\\s\\?]*)");
+			}, done).then(done, done);
+	}, {
+		befores: function (next) {
+			this.getStub("fs").readdir.callsArgWithAsync(1, null, [this.pars.twoPathResource]);
+			next();
+		}
+	});
+
     cup.pour("should succeed to convert a path with .", function (done) {
 
         var loader = this.getRequired("loader");
 
-        loader.load(this.pars.config) //, function (err, resources) {
+        loader(this.pars.config) //, function (err, resources) {
             .then(function (resources) {
                 var resource = resources[0];
 
@@ -90,7 +108,7 @@ describe("resources loader tests", function () {
 
         var loader = this.getRequired("loader");
 
-        loader.load(this.pars.config)
+        loader(this.pars.config)
             .then(function () {
                     throw new Error("should not have been resolved!");
                 },

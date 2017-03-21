@@ -50,7 +50,7 @@ describe("file processor tests", function () {
 
 	cup.pour("should successfully load file - with absolute file path", function (done) {
 
-		var processorFn = this.getRequired("processor").create();
+		var processorFn = this.getRequired("processor")();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsNoParent, function (data) {
 			expect(data.fileStream).to.equal(cup.pars.fileStream);
@@ -75,7 +75,7 @@ describe("file processor tests", function () {
 
 	cup.pour("should successfully load file - with rel file path and with parent", function (done) {
 
-		var processorFn = this.getRequired("processor").create();
+		var processorFn = this.getRequired("processor")();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsWithParent, function (data) {
 			expect(data.fileStream).to.equal(cup.pars.fileStream);
@@ -103,7 +103,7 @@ describe("file processor tests", function () {
 
 	cup.pour("should successfully load file - with rel file path and no parent", function (done) {
 
-		var processorFn = this.getRequired("processor").create();
+		var processorFn = this.getRequired("processor")();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsNoParent, function (data) {
 			expect(data.fileStream).to.equal(cup.pars.fileStream);
@@ -136,7 +136,7 @@ describe("file processor tests", function () {
 
 	cup.pour("should set not found on file not found", function (done) {
 
-		var processorFn = this.getRequired("processor").create();
+		var processorFn = this.getRequired("processor")();
 
 		processorFn(this.pars.req, this.pars.res, _.clone(this.pars.responseData), this.pars.optionsNoParent, function (data) {
 			expect(data.fileStream).to.not.exist();
@@ -152,7 +152,7 @@ describe("file processor tests", function () {
 	});
 
 	cup.pour("should just continue if not isFile", function (done) {
-		var processorFn = this.getRequired("processor").create();
+		var processorFn = this.getRequired("processor")();
 
 		var options = {notFound: false};
 
@@ -164,7 +164,7 @@ describe("file processor tests", function () {
 	});
 
 	cup.pour("should just continue if already not found", function (done) {
-		var processorFn = this.getRequired("processor").create();
+		var processorFn = this.getRequired("processor")();
 
 		var options = {isFile: true, notFound: true};
 

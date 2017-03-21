@@ -1,23 +1,10 @@
+"use strict";
+
 import fs from "fs";
 import path from "path";
 import Debug from "debug";
 
 const debug = Debug("smocker");
-
-function create(/*config*/) {
-	return (req, res, responseData, options, next) => {
-
-		if (responseData.isFile && !options.notFound) {
-			debug("fileProcessor - responding with file to : " + req.url);
-			_attachFileStream(req, res, responseData, options, ()=> {
-				next(responseData);
-			});
-		}
-		else{
-			next(responseData);
-		}
-	};
-}
 
 function _attachFileStream(req, res, responseData, options, cb) {
 	var filePath = _getFilePath(responseData, options);
@@ -53,4 +40,16 @@ function _getFilePath(responseData, options) {
 	return filePath;
 }
 
-export {create};
+export default (/*config*/) =>
+	(req, res, responseData, options, next) => {
+
+		if (responseData.isFile && !options.notFound) {
+			debug("fileProcessor - responding with file to : " + req.url);
+			_attachFileStream(req, res, responseData, options, () => {
+				next(responseData);
+			});
+		}
+		else {
+			next(responseData);
+		}
+	};

@@ -67,7 +67,7 @@ describe("http responder tests", function () {
     cup.pour("should handle not found response", function () {
         var responder = this.getRequired("responder");
 
-        responder.respond(this.pars.req, this.pars.res, {
+        responder(this.pars.req, this.pars.res, {
             notFound: true,
             responseData: {},
             config: this.pars.config
@@ -86,7 +86,7 @@ describe("http responder tests", function () {
     cup.pour("should handle http method response", function () {
         var responder = this.getRequired("responder");
 
-        responder.respond(this.pars.req, this.pars.res, {
+        responder(this.pars.req, this.pars.res, {
             responseData: {response: this.pars.jsonResponse, statusCode: this.pars.statusCode},
             config: this.pars.config
         });
@@ -101,9 +101,9 @@ describe("http responder tests", function () {
     });
 
     cup.pour("should handle http method response with cors", function () {
-        var responder = this.getRequired("responder");
+	    const responder = this.getRequired("responder");
 
-        responder.respond(this.pars.req, this.pars.res, {
+        responder(this.pars.req, this.pars.res, {
             responseData: {response: this.pars.jsonResponse, statusCode: this.pars.statusCode},
             config: {
                 headers: {"test": "123"},
@@ -128,9 +128,9 @@ describe("http responder tests", function () {
 
     cup.pour("should handle jsonp response", function () {
 
-        var responder = this.getRequired("responder");
+	    const responder = this.getRequired("responder");
 
-        responder.respond(this.pars.req, this.pars.res, {
+        responder(this.pars.req, this.pars.res, {
             responseData: {response: this.pars.jsonResponse},
             jsonpName: this.pars.jsonpName,
             config: this.pars.config
@@ -145,9 +145,9 @@ describe("http responder tests", function () {
     });
 
     cup.pour("should handle file response successfully", function () {
-        var responder = this.getRequired("responder");
+	    const responder = this.getRequired("responder");
 
-        responder.respond(this.pars.req, this.pars.res, {
+        responder(this.pars.req, this.pars.res, {
             responseData: {
                 filePath: this.pars.filePath,
                 headers: {
@@ -173,9 +173,9 @@ describe("http responder tests", function () {
     });
 
     cup.pour("should handle file response with file not found", function () {
-        var responder = this.getRequired("responder");
+        const responder = this.getRequired("responder");
 
-        responder.respond(this.pars.req, this.pars.res, {
+        responder(this.pars.req, this.pars.res, {
             notFound: true,
             responseData: {
                 filePath: this.pars.filePath,

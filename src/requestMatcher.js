@@ -1,8 +1,9 @@
 import _ from "lodash";
 import Debug  from "debug";
+
 const debug = Debug("smocker");
 
-function match(req, resources) {
+export default (req, resources) =>{
 	let reqUrl = req.url,
 		reqMethod = req.method,
 		result = {
@@ -24,6 +25,4 @@ function match(req, resources) {
 	});
 
 	return result;
-}
-
-export {match};
+};
