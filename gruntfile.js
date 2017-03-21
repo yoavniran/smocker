@@ -71,7 +71,7 @@ module.exports = function (grunt) {
 			coverage: {
 				options: {
 					reporter: "mocha-lcov-reporter",
-					quiet: true,
+					quiet: false,
 					captureFile: "./output/coverage.lcov.txt"
 				},
 				src: ["./output/coverage/test/smocker.tests.js"]
