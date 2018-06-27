@@ -1,5 +1,6 @@
 import _ from "lodash";
 import Debug  from "debug";
+import URL from "url-parse";
 
 const debug = Debug("smocker");
 
@@ -13,7 +14,8 @@ export default (req, resources) =>{
 
 	_.find(resources,(res)=> { //cant use Array.find while supporting Node 0.12
 
-		let match = res.rgx.exec(reqUrl);
+		const parsed = new URL(reqUrl);
+		let match = res.rgx.exec(parsed.pathname);
 
 		if (match) {
 			debug("requestMatcher - found matching resource dir for request: " + reqUrl);
