@@ -10,13 +10,14 @@ describe("resources loader tests", function () {
     chai.use(sinonChai);
     chai.use(dirtyChai);
 
-    var cup = stirrer.grind({
+    const cup = stirrer.grind({
         pars: {
             config: {
                 requestPrefix: "myPrfx",
                 resources: "bla/bla",
                 dynamicSymbol: "$"
             },
+	        signResource: "sign",
             simpleResource: "orders.users",
             pathResource: "campaigns.target.$",
 	        twoPathResource: "campaigns.target.$.field.$",
@@ -31,7 +32,6 @@ describe("resources loader tests", function () {
     cup.pour("should succeed to convert a simple path", function (done) {
 
         var loader = this.getRequired("loader");
-
         var p = loader(this.pars.config);
 
         expect(p).to.exist();

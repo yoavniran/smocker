@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "test": "grunt build --verbose"
+    "test": "grunt test",
+    "build": "grunt build --verbose"
   },
   "repository": {
     "type": "git",
@@ -37,7 +38,8 @@
   "dependencies": {
     "debug": "^2.2.0",
     "lodash": "^3.10.1",
-    "lru-cache": "^2.7.0"
+    "lru-cache": "^2.7.0",
+    "url-parse": "^1.4.1"
   },
   "devDependencies": {
     "blanket": "^1.1.7",
