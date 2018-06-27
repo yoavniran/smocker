@@ -316,6 +316,9 @@ module.exports = function(req, options, utils){
 
 ## Change Log
 
+### 1.0.1
+* fixed incorrect matching of url with query param on simple rule
+ 
 ### 1.0.0
 * added possibility to return promise from function form module
 * added .editorconfig
